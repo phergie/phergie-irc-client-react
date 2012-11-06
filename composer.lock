@@ -1,0 +1,252 @@
+{
+    "hash": "2db264015125386d72e928f6871f4af5",
+    "packages": [
+        {
+            "name": "evenement/evenement",
+            "version": "1.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/igorw/evenement",
+                "reference": "e3069e43228cba12f3e6e76ad53401232f9bacfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/igorw/evenement/zipball/e3069e43228cba12f3e6e76ad53401232f9bacfb",
+                "reference": "e3069e43228cba12f3e6e76ad53401232f9bacfb",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "time": "1351867497",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Evenement": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch",
+                    "homepage": "http://wiedler.ch/igor/"
+                }
+            ],
+            "description": "Événement is a very simple event dispatching library for PHP 5.3",
+            "keywords": [
+                "event-dispatcher"
+            ]
+        },
+        {
+            "name": "phergie/phergie-irc-connection",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phergie/phergie-irc-connection",
+                "reference": "3bc79ba183a171c17535d02d21dfc23ccff6bbf7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/phergie/phergie-irc-connection/archive/3bc79ba183a171c17535d02d21dfc23ccff6bbf7.zip",
+                "reference": "3bc79ba183a171c17535d02d21dfc23ccff6bbf7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1352050801",
+            "type": "library",
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Phergie": "src"
+                }
+            },
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "Data structure for containing information about an IRC client connection",
+            "keywords": [
+                "client",
+                "server",
+                "Connection",
+                "irc"
+            ]
+        },
+        {
+            "name": "phergie/phergie-irc-generator",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phergie/phergie-irc-generator",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/phergie/phergie-irc-generator/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1352072402",
+            "type": "library",
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Phergie": "src"
+                }
+            },
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "Generator for messages conforming to the IRC protocol",
+            "keywords": [
+                "generator",
+                "irc"
+            ]
+        },
+        {
+            "name": "phergie/phergie-irc-parser",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phergie/phergie-irc-parser",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/phergie/phergie-irc-parser/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "1350749907",
+            "type": "library",
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "Phergie": "src"
+                }
+            },
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "Parser for messages conforming to the IRC protocol",
+            "keywords": [
+                "parser",
+                "irc"
+            ]
+        },
+        {
+            "name": "react/event-loop",
+            "version": "dev-master",
+            "target-dir": "React/EventLoop",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/event-loop",
+                "reference": "9388c315bd2ef516ce465fd7de6d179f5c450fbc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/reactphp/event-loop/archive/9388c315bd2ef516ce465fd7de6d179f5c450fbc.zip",
+                "reference": "9388c315bd2ef516ce465fd7de6d179f5c450fbc",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-libevent": ">=0.0.5"
+            },
+            "time": "1352121935",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.2-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "React\\EventLoop": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Event loop abstraction layer that libraries can use for evented I/O.",
+            "keywords": [
+                "event-loop"
+            ]
+        },
+        {
+            "name": "react/stream",
+            "version": "dev-master",
+            "target-dir": "React/Stream",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/reactphp/stream",
+                "reference": "f44ee584058dbd30d471a4c210071a5618e61545"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/reactphp/stream/archive/f44ee584058dbd30d471a4c210071a5618e61545.zip",
+                "reference": "f44ee584058dbd30d471a4c210071a5618e61545",
+                "shasum": ""
+            },
+            "require": {
+                "evenement/evenement": "1.0.*",
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "react/event-loop": "0.2.*"
+            },
+            "time": "1352121935",
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.2-dev"
+                }
+            },
+            "installation-source": "source",
+            "autoload": {
+                "psr-0": {
+                    "React\\Stream": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Basic readable and writable stream interfaces that support piping.",
+            "keywords": [
+                "stream",
+                "pipe"
+            ]
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "phergie/phergie-irc-parser": 20,
+        "phergie/phergie-irc-generator": 20,
+        "phergie/phergie-irc-connection": 20,
+        "react/event-loop": 20,
+        "react/stream": 20
+    }
+}

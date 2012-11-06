@@ -1,0 +1,26 @@
+{
+    "minimum-stability": "dev",
+    "name": "phergie/phergie-irc-client-react",
+    "description": "IRC client library built on React",
+    "keywords": [ "irc", "client", "react" ],
+    "license": "BSD-2-Clause",
+    "support": {
+        "email": "team@phergie.org",
+        "irc": "irc://irc.freenode.net/phergie",
+        "issues": "https://github.com/phergie/phergie-irc-client-react/issues",
+        "source": "https://github.com/phergie/phergie-irc-client-react"
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "phergie/phergie-irc-parser": "dev-master",
+        "phergie/phergie-irc-generator": "dev-master",
+        "phergie/phergie-irc-connection": "dev-master",
+        "react/event-loop": "dev-master",
+        "react/stream": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Phergie": "src"
+        }
+    }
+}
