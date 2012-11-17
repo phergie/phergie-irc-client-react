@@ -16,7 +16,8 @@
         "phergie/phergie-irc-generator": "dev-master",
         "phergie/phergie-irc-connection": "dev-master",
         "react/event-loop": "dev-master",
-        "react/stream": "dev-master"
+        "react/stream": "dev-master",
+        "monolog/monolog": "@dev"
     },
     "autoload": {
         "psr-0": {

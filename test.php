@@ -5,8 +5,8 @@
 
 require_once 'vendor/autoload.php';
 
-use Phergie\Irc\Connection;
-use Phergie\Irc\Client\React;
+use Phergie\Irc\Client\React\Connection;
+use Phergie\Irc\Client\React\Client;
 
 $connection = new Connection;
 $connection->setServerHostname('irc.freenode.net');
@@ -16,6 +16,6 @@ $connection->setServername('irc.freenode.net');
 $connection->setRealname('Matthew Turland');
 $connection->setNickname('Phergie3');
 
-$client = new React;
+$client = new Client;
 $client->addConnection($connection);
 $client->run();
