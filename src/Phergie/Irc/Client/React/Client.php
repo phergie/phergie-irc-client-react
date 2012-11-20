@@ -11,10 +11,8 @@
 namespace Phergie\Irc\Client\React;
 
 use Evenement\EventEmitter;
-use Evenement\EventEmitterInterface;
+use Phergie\Irc\ConnectionInterface;
 use React\EventLoop\LoopInterface;
-use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
 
 /**
  * IRC client implementation based on the React component library.
@@ -37,13 +35,13 @@ class Client extends EventEmitter
      * @var \Phergie\Irc\ConnectionInterface[]
      */
     protected $connections = array();
-    
+
     /**
-     * Buffer for partial messages received
+     * Logging stream
      *
-     * @var string
+     * @var \Phergie\Irc\Client\React\LoggerStream
      */
-    protected $buffer = '';
+    protected $logger;
 
     /**
      * Sets the event loop dependency.
@@ -72,9 +70,9 @@ class Client extends EventEmitter
      * Adds a connection to establish and listen on for events once the event
      * loop is executed.
      *
-     * @param \Phergie\Irc\Client\React\Connection $connection
+     * @param \Phergie\Irc\ConnectionInterface $connection
      */
-    public function addConnection(Connection $connection)
+    public function addConnection(ConnectionInterface $connection)
     {
         $this->connections[] = $connection;
     }
@@ -113,10 +111,10 @@ class Client extends EventEmitter
     /**
      * Derives a remote for a given connection.
      *
-     * @param \Phergie\Irc\Client\React\Connection $connection
+     * @param \Phergie\Irc\ConnectionInterface $connection
      * @return string Remote usable to establish a socket connection
      */
-    protected function getRemote(Connection $connection)
+    protected function getRemote(ConnectionInterface $connection)
     {
         $transport = $connection->getOption('transport');
         if ($transport === null) {
@@ -131,10 +129,10 @@ class Client extends EventEmitter
     /**
      * Derives a set of socket context options for a given connection.
      *
-     * @param \Phergie\Irc\Client\React\Connection $connection
+     * @param \Phergie\Irc\ConnectionInterface $connection
      * @return array Associative array of context option key-value pairs
      */
-    protected function getContext(Connection $connection)
+    protected function getContext(ConnectionInterface $connection)
     {
         $context = array();
         if ($connection->getOption('force-ipv4')) {
@@ -149,90 +147,81 @@ class Client extends EventEmitter
     }
 
     /**
-     * Returns a stream instance for receiving events from the server.
+     * Returns a stream for a socket connection.
      *
      * @param resource $socket Socket for the connection to the server
      * @param \React\EventLoop\LoopInterface $loop Event loop
+     * @return \React\Stream\Stream
+     */
+    protected function getStream($socket, LoopInterface $loop)
+    {
+        return new \React\Stream\Stream($socket, $loop);
+    }
+
+    /**
+     * Returns a stream instance for parsing messages from the server and
+     * emitting them as events.
+     *
      * @return \Phergie\Irc\Client\React\ReadStream
      */
-    protected function getReadStream($socket, LoopInterface $loop)
+    protected function getReadStream()
     {
-        return new ReadStream($socket, $loop);
+        return new ReadStream();
     }
 
     /**
      * Returns a stream instance for sending events to the server.
      *
-     * @param resource $socket Socket for the connection to the server
-     * @param \React\EventLoop\LoopInterface $loop Event loop
      * @return \Phergie\Irc\Client\React\WriteStream
      */
-    protected function getWriteStream($socket, LoopInterface $loop)
+    protected function getWriteStream()
     {
-        return new WriteStream($socket, $loop);
+        return new WriteStream();
     }
 
     /**
-     * Returns a stream instance for receiving events from and sending events
-     * to the server and logging them as they occur.
+     * Returns a stream instance for logging data on the socket connection.
      *
-     * @param \React\Stream\ReadableStreamInterface $read
-     * @param \React\Stream\WritableStreamInterface $write
      * @return \Phergie\Irc\Client\React\LoggerStream
      */
-    protected function getLoggerStream(ReadableStreamInterface $read, WritableStreamInterface $write)
+    protected function getLoggerStream()
     {
-        return new LoggerStream($read, $write);
-    }
-
-    /**
-     * Sets one event emitter to listen and transmit events from another event emitter.
-     *
-     * @param \Evenement\EventEmitterInterface $sender Original sender of the events
-     * @param \Evenement\EventEmitterInterface $recipient Recipient to transmit the events
-     * @param string $event Name of the event
-     * @param array $args Optional additional arguments to include when transmitting
-     */
-    protected function transmit(EventEmitterInterface $sender, EventEmitterInterface $recipient, $event, array $args = array())
-    {
-        $sender->on($event, function() use ($recipient, $event, $args) {
-            $recipient->emit($event, array_merge(func_get_args(), $args));
-        });
+        if (!$this->logger) {
+            $this->logger = new LoggerStream();
+        }
+        return $this->logger;
     }
 
     /**
      * Initializes an IRC connection.
      *
+     * @param \Phergie\Irc\ConnectionInterface $connection Metadata for connection to establish
      * @param \React\EventLoop\LoopInterface $loop Event loop to listen for events on the connection
-     * @param \Phergie\Irc\Client\React\Connection $connection Metadata for connection to establish
      * @throws \Phergie\Irc\Client\React\Exception if unable to establish the connection
      */
-    protected function connect(Connection $connection, LoopInterface $loop)
+    protected function connect(ConnectionInterface $connection, LoopInterface $loop)
     {
         // Establish the socket connection
         $remote = $this->getRemote($connection);
         $context = $this->getContext($connection);
         $socket = $this->getSocket($remote, $context);
+        $stream = $this->getStream($socket, $loop);
 
-        // Get streams to receive messages from and send messages to the server
-        $read = $this->getReadStream($socket, $loop);
-        $write = $this->getWriteStream($socket, $loop);
-        $logger = $this->getLoggerStream($read, $write);
+        // Configure streams to handle messages received from and sent to the server
+        $read = $this->getReadStream();
+        $write = $this->getWriteStream();
+        $logger = $this->getLoggerStream();
 
-        // Stores the streams in the connection for later use
-        $connection->setReadStream($logger);
-        $connection->setWriteStream($logger);
+        $stream->pipe($logger);
+        $stream->pipe($read);
+        $write->pipe($logger);
+        $write->pipe($stream);
+        $client = $this;
+        $read->on('irc', function($message) use ($client, $write, $connection, $logger) {
+            $client->emit('irc', array($message, $write, $connection));
+        });
 
-        // Transmit events on both streams to listeners of the client
-        $args = array($connection);
-        foreach (array('data', 'end', 'error', 'close', 'irc') as $event) {
-            $this->transmit($read, $this, $event, $args);
-        }
-        foreach (array('drain', 'error', 'close', 'pipe') as $event) {
-            $this->transmit($write, $this, $event, $args);
-        }
-
-        // Establish the user's identity
+        // Establish the user's identity to the server
         $password = $connection->getPassword();
         if ($password) {
             $write->ircPass($password);

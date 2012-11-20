@@ -5,7 +5,7 @@
 
 require_once 'vendor/autoload.php';
 
-use Phergie\Irc\Client\React\Connection;
+use Phergie\Irc\Connection;
 use Phergie\Irc\Client\React\Client;
 
 $connection = new Connection;

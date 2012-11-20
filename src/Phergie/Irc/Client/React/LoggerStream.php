@@ -10,51 +10,22 @@
 
 namespace Phergie\Irc\Client\React;
 
-use Evenement\EventEmitter;
-use React\Stream\ReadableStreamInterface;
-use React\Stream\WritableStreamInterface;
+use React\Stream\ThroughStream;
 
 /**
- * Stream that logs data read from or written to it using Monolog if it's
- * available.
+ * Stream that logs data piped to it using Monolog if it's available.
  *
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-class LoggerStream extends EventEmitter implements ReadableStreamInterface, WritableStreamInterface
+class LoggerStream extends ThroughStream
 {
-    /**
-     * Stream for which data read from it is logged
-     *
-     * @var \React\Stream\ReadableStreamInterface
-     */
-    protected $read;
-
-    /**
-     * Stream for which data written to it is logged
-     *
-     * @var \React\Stream\WritableStreamInterface
-     */
-    protected $write;
-
     /**
      * Logger for data read from or written to the stream
      *
      * @var \Monolog\Logger
      */
     protected $logger;
-
-    /**
-     * Accepts an optional writable stream to proxy to.
-     */
-    public function __construct(ReadableStreamInterface $read, WritableStreamInterface $write)
-    {
-        $this->read = $read;
-        $this->write = $write;
-        $this->logger = $this->getLogger();
-
-        $read->on('irc', array($this, 'handleRead'));
-    }
 
     /**
      * Returns the logger in use.
@@ -87,90 +58,17 @@ class LoggerStream extends EventEmitter implements ReadableStreamInterface, Writ
     }
 
     /**
-     * Handles IRC messages being read from the read stream.
-     *
-     * @param array $message
-     */
-    public function handleRead(array $message)
-    {
-        if ($this->logger) {
-            $this->logger->debug('S ' . $message['message']);
-        }
-    }
-
-    /**
-     * Implements WritableStreamInterface::isWritable().
-     *
-     * @return boolean
-     */
-    public function isWritable()
-    {
-        return $this->write->isWritable();
-    }
-
-    /**
-     * Implements WritableStreamInterface::write().
+     * Logs data received on the stream.
      *
      * @param string $data
+     * @return string
      */
-    public function write($data)
+    public function filter($data)
     {
-        if ($this->logger) {
-            $this->logger->debug('C ' . $data);
+        $logger = $this->getLogger();
+        if ($logger) {
+            $logger->debug($data);
         }
-
-        return $this->write->write($data);
-    }
-
-    /**
-     * Implements WritableStreamInterface::end().
-     *
-     * @param string $data
-     */
-    public function end($data = null)
-    {
-        return $this->write->end($data);
-    }
-
-    /**
-     * Implements StreamInterface::close().
-     */
-    public function close()
-    {
-        return $this->write->close();
-    }
-
-    /**
-     * Implements ReadableStreamInterface::isReadable().
-     *
-     * @return boolean
-     */
-    public function isReadable()
-    {
-        return $this->read->isReadable();
-    }
-
-    /**
-     * Implements ReadableStreamInterface::pause().
-     */
-    public function pause()
-    {
-        return $this->read->pause();
-    }
-
-    /**
-     * Implements ReadableStreamInterface::resume().
-     */
-    public function resume()
-    {
-        return $this->read->resume();
-    }
-
-    /**
-     * Implements ReadableStreamInterface::pipe().
-     */
-    public function pipe(WritableStreamInterface $dest, array $options = array())
-    {
-        return $this->read->pipe($dest, $options);
+        return $data;
     }
 }

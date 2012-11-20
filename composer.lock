@@ -178,18 +178,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser",
-                "reference": "08ef773f2fb288d111b182fabcc3b9e5ea340338"
+                "reference": "c701e4ecbd18419234392916fc42d93e198cb874"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/phergie/phergie-irc-parser/archive/08ef773f2fb288d111b182fabcc3b9e5ea340338.zip",
-                "reference": "08ef773f2fb288d111b182fabcc3b9e5ea340338",
+                "url": "https://github.com/phergie/phergie-irc-parser/archive/c701e4ecbd18419234392916fc42d93e198cb874.zip",
+                "reference": "c701e4ecbd18419234392916fc42d93e198cb874",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1352159587",
+            "time": "1353373515",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -213,21 +213,22 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/event-loop",
-                "reference": "9388c315bd2ef516ce465fd7de6d179f5c450fbc"
+                "reference": "v0.2.4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/event-loop/archive/9388c315bd2ef516ce465fd7de6d179f5c450fbc.zip",
-                "reference": "9388c315bd2ef516ce465fd7de6d179f5c450fbc",
+                "url": "https://github.com/reactphp/event-loop/archive/v0.2.4.zip",
+                "reference": "v0.2.4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "suggest": {
-                "ext-libevent": ">=0.0.5"
+                "ext-libevent": ">=0.0.5",
+                "ext-libev": "*"
             },
-            "time": "1352121935",
+            "time": "1352761205",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -255,12 +256,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream",
-                "reference": "f44ee584058dbd30d471a4c210071a5618e61545"
+                "reference": "3a7b79eeaf3a6bac26e77b9884fc041493b5d4be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/stream/archive/f44ee584058dbd30d471a4c210071a5618e61545.zip",
-                "reference": "f44ee584058dbd30d471a4c210071a5618e61545",
+                "url": "https://github.com/reactphp/stream/archive/3a7b79eeaf3a6bac26e77b9884fc041493b5d4be.zip",
+                "reference": "3a7b79eeaf3a6bac26e77b9884fc041493b5d4be",
                 "shasum": ""
             },
             "require": {
@@ -268,9 +269,10 @@
                 "php": ">=5.3.3"
             },
             "suggest": {
-                "react/event-loop": "0.2.*"
+                "react/event-loop": "0.2.*",
+                "react/promise": "1.0.*"
             },
-            "time": "1352121935",
+            "time": "1353313450",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -293,9 +295,7 @@
             ]
         }
     ],
-    "packages-dev": [
-
-    ],
+    "packages-dev": null,
     "aliases": [
 
     ],
