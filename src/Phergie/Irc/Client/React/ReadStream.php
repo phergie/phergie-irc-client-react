@@ -11,7 +11,7 @@
 namespace Phergie\Irc\Client\React;
 
 use Phergie\Irc\ParserInterface;
-use React\Stream\ThroughStream;
+use React\Stream\WritableStream;
 
 /**
  * Stream that extracts IRC messages from data piped to it and emits them as
@@ -20,7 +20,7 @@ use React\Stream\ThroughStream;
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-class ReadStream extends ThroughStream
+class ReadStream extends WritableStream
 {
     /**
      * IRC message parser
@@ -60,12 +60,12 @@ class ReadStream extends ThroughStream
     }
 
     /**
-     * Callback that parses messages from data piped to this stream and 
-     * emits them as events.
+     * Parses messages from data piped to this stream and emits them as
+     * events.
      *
      * @param string $data
      */
-    public function filter($data)
+    public function write($data)
     {
         $data = $this->tail . $data;
         $messages = $this->getParser()->consumeAll($data);
