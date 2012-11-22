@@ -11,8 +11,12 @@
 namespace Phergie\Irc\Client\React;
 
 use Evenement\EventEmitter;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Phergie\Irc\ConnectionInterface;
 use React\EventLoop\LoopInterface;
+use React\Stream\Stream;
 
 /**
  * IRC client implementation based on the React component library.
@@ -155,7 +159,20 @@ class Client extends EventEmitter
      */
     protected function getStream($socket, LoopInterface $loop)
     {
-        return new \React\Stream\Stream($socket, $loop);
+        return new Stream($socket, $loop);
+    }
+
+    /**
+     * Adds an event listener to log data emitted by a stream.
+     *
+     * @param \Evenement\EventEmitter $emitter
+     */
+    protected function addLogging(EventEmitter $emitter)
+    {
+        $logger = $this->getLogger();
+        $emitter->on('data', function($msg) use ($logger) {
+            $logger->debug($msg);
+        });
     }
 
     /**
@@ -166,7 +183,9 @@ class Client extends EventEmitter
      */
     protected function getReadStream()
     {
-        return new ReadStream();
+        $read = new ReadStream();
+        $this->addLogging($read);
+        return $read;
     }
 
     /**
@@ -176,18 +195,23 @@ class Client extends EventEmitter
      */
     protected function getWriteStream()
     {
-        return new WriteStream();
+        $write = new WriteStream();
+        $this->addLogging($write);
+        return $write;
     }
 
     /**
      * Returns a stream instance for logging data on the socket connection.
      *
-     * @return \Phergie\Irc\Client\React\LoggerStream
+     * @return \Monolog\Logger
      */
-    protected function getLoggerStream()
+    protected function getLogger()
     {
         if (!$this->logger) {
-            $this->logger = new LoggerStream();
+            $handler = new StreamHandler(STDERR, Logger::DEBUG);
+            $handler->setFormatter(new LineFormatter('%datetime% %level_name% %message%'));
+            $this->logger = new Logger(get_class($this));
+            $this->logger->pushHandler($handler);
         }
         return $this->logger;
     }
@@ -210,15 +234,12 @@ class Client extends EventEmitter
         // Configure streams to handle messages received from and sent to the server
         $read = $this->getReadStream();
         $write = $this->getWriteStream();
-        $logger = $this->getLoggerStream();
+        $write->pipe($stream)->pipe($read);
 
-        $stream->pipe($logger);
-        $stream->pipe($read);
-        $write->pipe($logger);
-        $write->pipe($stream);
         $client = $this;
+        $logger = $this->getLogger();
         $read->on('irc', function($message) use ($client, $write, $connection, $logger) {
-            $client->emit('irc', array($message, $write, $connection));
+            $client->emit('irc', array($message, $write, $connection, $logger));
         });
 
         // Establish the user's identity to the server

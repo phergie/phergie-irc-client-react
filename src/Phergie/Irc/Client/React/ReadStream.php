@@ -72,6 +72,7 @@ class ReadStream extends WritableStream
         $this->tail = $data;
 
         foreach ($messages as $message) {
+            $this->emit('data', array($message['message']));
             $this->emit('irc', array($message));
         }
 
