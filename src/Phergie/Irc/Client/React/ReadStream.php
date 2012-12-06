@@ -67,9 +67,9 @@ class ReadStream extends WritableStream
      */
     public function write($data)
     {
-        $data = $this->tail . $data;
-        $messages = $this->getParser()->consumeAll($data);
-        $this->tail = $data;
+        $all = $this->tail . $data;
+        $messages = $this->getParser()->consumeAll($all);
+        $this->tail = $all;
 
         foreach ($messages as $message) {
             $this->emit('data', array($message['message']));
