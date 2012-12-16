@@ -270,4 +270,27 @@ class Client extends EventEmitter
         }
         $loop->run();
     }
+
+    /**
+     * Convenient shorthand for adding event listeners.
+     *
+     * $callable is a callback that accepts the following parameters:
+     * - $message is an associative array containing data for an event received
+     *   from the server as obtained by \Phergie\Irc\Parser.
+     * - $write is an instance of \Phergie\Irc\Client\React\WriteStream for
+     *   sending new events from the client to the server.
+     * - $connection is an instance of \Phergie\Irc\Connection containing
+     *   metadata for the connection on which the event occurred.
+     * - $logger is an instance of \Monolog\Logger for logging any relevant
+     *   events from the listener.
+     *
+     * @param callable $callback
+     */
+    public function addListener($callback)
+    {
+        if (!is_callable($callback)) {
+            throw new \InvalidArgumentException('$callback must be of type callable');
+        }
+        $this->on('irc', $callback);
+    }
 }
