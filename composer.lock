@@ -1,5 +1,5 @@
 {
-    "hash": "d1477fdaef20de4ba785fd70b716bd79",
+    "hash": "a5cee044835754fbf4c4aaac0981fa19",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -18,7 +18,7 @@
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "1351909043",
+            "time": "2012-11-03 02:17:23",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -31,6 +31,7 @@
                     "Evenement": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -52,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog",
-                "reference": "b23cfd3d6ce0b6c050dda723040b83a1a6d7637e"
+                "reference": "546225bed27bea7d00b836e0f7d8954272e0cf42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Seldaek/monolog/archive/b23cfd3d6ce0b6c050dda723040b83a1a6d7637e.zip",
-                "reference": "b23cfd3d6ce0b6c050dda723040b83a1a6d7637e",
+                "url": "https://github.com/Seldaek/monolog/archive/546225bed27bea7d00b836e0f7d8954272e0cf42.zip",
+                "reference": "546225bed27bea7d00b836e0f7d8954272e0cf42",
                 "shasum": ""
             },
             "require": {
@@ -71,7 +72,7 @@
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
                 "ext-mongo": "Allow sending log messages to a MongoDB server"
             },
-            "time": "1352907970",
+            "time": "2012-12-04 11:59:29",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -84,6 +85,7 @@
                     "Monolog": "src/"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -119,7 +121,7 @@
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1352050801",
+            "time": "2012-11-04 17:40:01",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -127,6 +129,7 @@
                     "Phergie": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -155,7 +158,7 @@
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1352072402",
+            "time": "2012-11-04 23:40:02",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -163,6 +166,7 @@
                     "Phergie": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -189,7 +193,7 @@
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "1353373515",
+            "time": "2012-11-20 01:05:15",
             "type": "library",
             "installation-source": "source",
             "autoload": {
@@ -197,6 +201,7 @@
                     "Phergie": "src"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -213,12 +218,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/event-loop",
-                "reference": "v0.2.4"
+                "reference": "v0.2.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/event-loop/archive/v0.2.4.zip",
-                "reference": "v0.2.4",
+                "url": "https://github.com/reactphp/event-loop/archive/v0.2.5.zip",
+                "reference": "v0.2.5",
                 "shasum": ""
             },
             "require": {
@@ -228,7 +233,7 @@
                 "ext-libevent": ">=0.0.5",
                 "ext-libev": "*"
             },
-            "time": "1352761205",
+            "time": "2012-11-12 23:00:05",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -241,6 +246,7 @@
                     "React\\EventLoop": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -256,12 +262,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream",
-                "reference": "3a7b79eeaf3a6bac26e77b9884fc041493b5d4be"
+                "reference": "v0.2.5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/stream/archive/3a7b79eeaf3a6bac26e77b9884fc041493b5d4be.zip",
-                "reference": "3a7b79eeaf3a6bac26e77b9884fc041493b5d4be",
+                "url": "https://github.com/reactphp/stream/archive/v0.2.5.zip",
+                "reference": "v0.2.5",
                 "shasum": ""
             },
             "require": {
@@ -272,7 +278,7 @@
                 "react/event-loop": "0.2.*",
                 "react/promise": "1.0.*"
             },
-            "time": "1353313450",
+            "time": "2012-11-19 08:24:10",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -285,6 +291,7 @@
                     "React\\Stream": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -303,9 +310,6 @@
     "stability-flags": {
         "phergie/phergie-irc-parser": 20,
         "phergie/phergie-irc-generator": 20,
-        "phergie/phergie-irc-connection": 20,
-        "react/event-loop": 20,
-        "react/stream": 20,
-        "monolog/monolog": 20
+        "phergie/phergie-irc-connection": 20
     }
 }
