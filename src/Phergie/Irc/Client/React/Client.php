@@ -274,7 +274,7 @@ class Client extends EventEmitter
     /**
      * Convenient shorthand for adding event listeners.
      *
-     * $callable is a callback that accepts the following parameters:
+     * $callback is a callback that accepts the following parameters:
      * - $message is an associative array containing data for an event received
      *   from the server as obtained by \Phergie\Irc\Parser.
      * - $write is an instance of \Phergie\Irc\Client\React\WriteStream for
