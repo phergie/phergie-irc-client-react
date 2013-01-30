@@ -25,7 +25,11 @@ The recommended method of installation is [through composer](http://getcomposer.
 
 ```php
 <?php
+$connection = new \Phergie\Irc\Connection();
+// ...
+
 $client = new \Phergie\Irc\Client\React\Client();
+$client->addConnection($connection);
 $client->addListener(function($message, $write, $connection, $logger) {
     // ...
 });
