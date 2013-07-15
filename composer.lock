@@ -6,26 +6,25 @@
             "version": "1.0.x-dev",
             "source": {
                 "type": "git",
-                "url": "https://github.com/igorw/evenement",
-                "reference": "406a0bd40c4d934e020469b923fad6330512ed4c"
+                "url": "https://github.com/igorw/evenement.git",
+                "reference": "8b0918f8374327dfed4408fe467980ab41d556dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/igorw/evenement/archive/406a0bd40c4d934e020469b923fad6330512ed4c.zip",
-                "reference": "406a0bd40c4d934e020469b923fad6330512ed4c",
+                "url": "https://api.github.com/repos/igorw/evenement/zipball/8b0918f8374327dfed4408fe467980ab41d556dd",
+                "reference": "8b0918f8374327dfed4408fe467980ab41d556dd",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "time": "2012-11-03 02:17:23",
+            "time": "2012-12-29 17:04:52",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-master": "2.0-dev"
                 }
             },
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Evenement": "src"
@@ -52,34 +51,38 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Seldaek/monolog",
-                "reference": "546225bed27bea7d00b836e0f7d8954272e0cf42"
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "041aa3930f8d2b466ae897440ec9471d5159c5bf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/Seldaek/monolog/archive/546225bed27bea7d00b836e0f7d8954272e0cf42.zip",
-                "reference": "546225bed27bea7d00b836e0f7d8954272e0cf42",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/041aa3930f8d2b466ae897440ec9471d5159c5bf",
+                "reference": "041aa3930f8d2b466ae897440ec9471d5159c5bf",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=5.3.0",
+                "psr/log": ">=1.0,<2.0"
             },
             "require-dev": {
-                "mlehner/gelf-php": "1.0.*"
+                "doctrine/couchdb": "dev-master",
+                "mlehner/gelf-php": "1.0.*",
+                "raven/raven": "0.3.*"
             },
             "suggest": {
-                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-                "ext-mongo": "Allow sending log messages to a MongoDB server"
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "raven/raven": "Allow sending log messages to a Sentry server"
             },
-            "time": "2012-12-04 11:59:29",
+            "time": "2013-02-26 10:18:11",
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.3.x-dev"
+                    "dev-master": "1.4.x-dev"
                 }
             },
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Monolog": "src/"
@@ -97,11 +100,12 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Logging for PHP 5.3",
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
             "homepage": "http://github.com/Seldaek/monolog",
             "keywords": [
                 "log",
-                "logging"
+                "logging",
+                "psr-3"
             ]
         },
         {
@@ -123,22 +127,20 @@
             },
             "time": "2012-11-04 17:40:01",
             "type": "library",
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Phergie": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
             "description": "Data structure for containing information about an IRC client connection",
             "keywords": [
-                "client",
-                "server",
                 "Connection",
-                "irc"
+                "client",
+                "irc",
+                "server"
             ]
         },
         {
@@ -160,13 +162,11 @@
             },
             "time": "2012-11-04 23:40:02",
             "type": "library",
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Phergie": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -181,21 +181,20 @@
             "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phergie/phergie-irc-parser",
-                "reference": "c701e4ecbd18419234392916fc42d93e198cb874"
+                "url": "https://github.com/phergie/phergie-irc-parser.git",
+                "reference": "685a6fb77b55511f377414a7ee507126497349e8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/phergie/phergie-irc-parser/archive/c701e4ecbd18419234392916fc42d93e198cb874.zip",
-                "reference": "c701e4ecbd18419234392916fc42d93e198cb874",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/685a6fb77b55511f377414a7ee507126497349e8",
+                "reference": "685a6fb77b55511f377414a7ee507126497349e8",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-11-20 01:05:15",
+            "time": "2013-03-08 02:45:57",
             "type": "library",
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Phergie": "src"
@@ -207,8 +206,46 @@
             ],
             "description": "Parser for messages conforming to the IRC protocol",
             "keywords": [
-                "parser",
-                "irc"
+                "irc",
+                "parser"
+            ]
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "time": "2012-12-21 11:40:51",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
             ]
         },
         {
@@ -217,30 +254,29 @@
             "target-dir": "React/EventLoop",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/event-loop",
-                "reference": "v0.2.5"
+                "url": "https://github.com/reactphp/event-loop.git",
+                "reference": "v0.2.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/event-loop/archive/v0.2.5.zip",
-                "reference": "v0.2.5",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/v0.2.7",
+                "reference": "v0.2.7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "suggest": {
-                "ext-libevent": ">=0.0.5",
-                "ext-libev": "*"
+                "ext-libev": "*",
+                "ext-libevent": ">=0.0.5"
             },
-            "time": "2012-11-12 23:00:05",
+            "time": "2013-01-05 11:41:26",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-master": "0.2-dev"
                 }
             },
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "React\\EventLoop": ""
@@ -261,13 +297,13 @@
             "target-dir": "React/Stream",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/stream",
-                "reference": "v0.2.5"
+                "url": "https://github.com/reactphp/stream.git",
+                "reference": "5e26018091a628f5b72dd4b690af8b24f64a642c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/stream/archive/v0.2.5.zip",
-                "reference": "v0.2.5",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/5e26018091a628f5b72dd4b690af8b24f64a642c",
+                "reference": "5e26018091a628f5b72dd4b690af8b24f64a642c",
                 "shasum": ""
             },
             "require": {
@@ -276,16 +312,15 @@
             },
             "suggest": {
                 "react/event-loop": "0.2.*",
-                "react/promise": "1.0.*"
+                "react/promise": "~1.0"
             },
-            "time": "2012-11-19 08:24:10",
+            "time": "2013-01-20 18:59:54",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-master": "0.2-dev"
                 }
             },
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "React\\Stream": ""
@@ -297,8 +332,8 @@
             ],
             "description": "Basic readable and writable stream interfaces that support piping.",
             "keywords": [
-                "stream",
-                "pipe"
+                "pipe",
+                "stream"
             ]
         }
     ],
