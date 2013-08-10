@@ -49,7 +49,7 @@ class ReadStream extends WritableStream
     /**
      * Returns the IRC message parser in use.
      *
-     * @return \Phergie\Irc\ParserInterface $parser
+     * @return \Phergie\Irc\ParserInterface
      */
     public function getParser()
     {
@@ -75,7 +75,5 @@ class ReadStream extends WritableStream
             $this->emit('data', array($message['message']));
             $this->emit('irc', array($message));
         }
-
-        return $data;
     }
 }
