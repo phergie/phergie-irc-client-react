@@ -205,7 +205,7 @@ class Client extends EventEmitter
      *
      * @return \Monolog\Logger
      */
-    protected function getLogger()
+    public function getLogger()
     {
         if (!$this->logger) {
             $handler = new StreamHandler(STDERR, Logger::DEBUG);
@@ -214,6 +214,16 @@ class Client extends EventEmitter
             $this->logger->pushHandler($handler);
         }
         return $this->logger;
+    }
+
+    /**
+     * Sets a logger for logging data on the socket connection.
+     *
+     * @param \Monolog\Logger
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 
     /**
