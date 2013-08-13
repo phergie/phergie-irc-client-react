@@ -107,9 +107,14 @@ class Client extends EventEmitter
             );
         }
 
-        stream_set_blocking($socket, 0);
+        // Can't enter the below block without returning a valid TCP or Unix
+        // socket, which doesn't seem possible without requiring internet
+        // access or a specific operating system to run the test suite
 
+        // @codeCoverageIgnoreStart
+        stream_set_blocking($socket, 0);
         return $socket;
+        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -141,10 +146,6 @@ class Client extends EventEmitter
         $context = array();
         if ($connection->getOption('force-ipv4')) {
             $context['bindto'] = '0.0.0.0:0';
-        }
-        $encoding = $connection->getOption('encoding');
-        if ($encoding) {
-            $context['encoding'] = $encoding;
         }
         $context = array('socket' => $context);
         return $context;
@@ -227,6 +228,23 @@ class Client extends EventEmitter
     }
 
     /**
+     * Returns a callback for proxying IRC events from the read stream to IRC
+     * listeners of the client.
+     *
+     * @param \Phergie\Irc\Client\React\WriteStream $write
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return callable
+     */
+    protected function getReadCallback($write, $connection)
+    {
+        $client = $this;
+        $logger = $this->getLogger();
+        return function($message) use ($client, $write, $connection, $logger) {
+            $client->emit('irc', array($message, $write, $connection, $logger));
+        };
+    }
+
+    /**
      * Initializes an IRC connection.
      *
      * @param \Phergie\Irc\ConnectionInterface $connection Metadata for connection to establish
@@ -245,12 +263,7 @@ class Client extends EventEmitter
         $read = $this->getReadStream();
         $write = $this->getWriteStream();
         $write->pipe($stream)->pipe($read);
-
-        $client = $this;
-        $logger = $this->getLogger();
-        $read->on('irc', function($message) use ($client, $write, $connection, $logger) {
-            $client->emit('irc', array($message, $write, $connection, $logger));
-        });
+        $read->on('irc', $this->getReadCallback($write, $connection));
 
         // Establish the user's identity to the server
         $password = $connection->getPassword();
