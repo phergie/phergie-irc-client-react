@@ -52,6 +52,26 @@ $client->run();
    3. `$connection` is an instance of `\Phergie\Irc\Connection` (which implements the interface `\Phergie\Irc\ConnectionInterface` -- see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods) containing metadata for the connection on which the event occurred.
    4. `$logger` is an instance of `\Monolog\Logger` for logging any relevant events from the listener, which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default. See [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information.
 
+## Connection Options
+
+### force-ip4
+
+Connection sockets will use IPv6 by default where available. If you need to force usage of IPv4, set this option to `true`.
+
+```php
+<?php
+$connection->setOption('force-ipv4', true);
+```
+
+### transport
+
+By default, a standard TCP socket is used. For IRC servers that support TLS or SSL, specify an [appropriate transport](http://www.php.net/manual/en/transports.inet.php).
+
+```php
+<?php
+$connection->setOption('transport', 'ssl');
+```
+
 ## Tests
 
 To run the unit test suite:
