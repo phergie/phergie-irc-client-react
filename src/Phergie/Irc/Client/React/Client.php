@@ -288,9 +288,13 @@ class Client extends EventEmitter
     public function run()
     {
         $loop = $this->getLoop();
+        $this->emit('connect.before.all', array($this->connections));
         foreach ($this->connections as $connection) {
+            $this->emit('connect.before.each', array($connection));
             $this->connect($connection, $loop);
+            $this->emit('connect.after.each', array($connection));
         }
+        $this->emit('connect.after.all', array($this->connections));
         $loop->run();
     }
 

@@ -433,19 +433,43 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $connection1 = $this->getMockConnection();
         $connection2 = $this->getMockConnection();
 
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('connect', 'getLoop'));
+        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('connect', 'getLoop', 'emit'));
         $client
             ->expects($this->at(0))
             ->method('getLoop')
             ->will($this->returnValue($loop));
         $client
             ->expects($this->at(1))
+            ->method('emit')
+            ->with('connect.before.all', array(array($connection1, $connection2)));
+        $client
+            ->expects($this->at(2))
+            ->method('emit')
+            ->with('connect.before.each', array($connection1));
+        $client
+            ->expects($this->at(3))
             ->method('connect')
             ->with($connection1, $loop);
         $client
-            ->expects($this->at(2))
+            ->expects($this->at(4))
+            ->method('emit')
+            ->with('connect.after.each', array($connection1));
+        $client
+            ->expects($this->at(5))
+            ->method('emit')
+            ->with('connect.before.each', array($connection2));
+        $client
+            ->expects($this->at(6))
             ->method('connect')
             ->with($connection2, $loop);
+        $client
+            ->expects($this->at(7))
+            ->method('emit')
+            ->with('connect.after.each', array($connection2));
+        $client
+            ->expects($this->at(8))
+            ->method('emit')
+            ->with('connect.after.all', array(array($connection1, $connection2)));
 
         $client->addConnection($connection1);
         $client->addConnection($connection2);

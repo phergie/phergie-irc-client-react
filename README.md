@@ -74,6 +74,56 @@ By default, a standard TCP socket is used. For IRC servers that support TLS or S
 $connection->setOption('transport', 'ssl');
 ```
 
+## Client Events
+
+In addition to the `addListener()` convenience method for registering listeners for IRC-level events, there are other lower-level events for which you can also add listeners.
+
+### connect.before.all
+
+Emitted before any connections are established. Includes an array of objects that implement `\Phergie\Irc\ConnectionInterface` as its only parameter.
+
+```php
+<?php
+$client->on('connect.before.all', function(array $connections) {
+    // ...
+});
+```
+
+### connect.after.all
+
+Emitted after all connections are established. Includes an array of objects that implement `\Phergie\Irc\ConnectionInterface` as its only parameter.
+
+```php
+<?php
+$client->on('connect.after.all', function(array $connections) {
+    // ...
+});
+```
+
+### connect.before.each
+
+Emitted before each connection is established. Includes an object that implements `\Phergie\Irc\ConnectionInterface` as its only parameter.
+
+```php
+<?php
+$client->on('connect.before.each', function(\Phergie\Irc\ConnectionInterface $connection) {
+    // ...
+});
+```
+
+### connect.after.each
+
+Emitted after each connection is established. Includes an object that implements `\Phergie\Irc\ConnectionInterface` as its only parameter.
+
+```php
+<?php
+$client->on('connect.after.each', function(\Phergie\Irc\ConnectionInterface $connection) {
+    // ...
+});
+```
+
+One potentially useful application of this is to institute a delay between connections in cases where the client is attempting to establish multiple connections to the same server and that server throttles connection attempts by origin to prevent abuse, DDoS attacks, etc.
+
 ## Tests
 
 To run the unit test suite:
