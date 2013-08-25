@@ -34,13 +34,6 @@ class Client extends EventEmitter
     protected $loop;
 
     /**
-     * List of connections
-     *
-     * @var \Phergie\Irc\ConnectionInterface[]
-     */
-    protected $connections = array();
-
-    /**
      * Logging stream
      *
      * @var \Phergie\Irc\Client\React\LoggerStream
@@ -71,17 +64,6 @@ class Client extends EventEmitter
     }
 
     /**
-     * Adds a connection to establish and listen on for events once the event
-     * loop is executed.
-     *
-     * @param \Phergie\Irc\ConnectionInterface $connection
-     */
-    public function addConnection(ConnectionInterface $connection)
-    {
-        $this->connections[] = $connection;
-    }
-
-    /**
      * Returns a socket configured for a specified remote.
      *
      * @param string $remote Address to connect the socket to (e.g. tcp://irc.freenode.net:6667)
@@ -107,14 +89,8 @@ class Client extends EventEmitter
             );
         }
 
-        // Can't enter the below block without returning a valid TCP or Unix
-        // socket, which doesn't seem possible without requiring internet
-        // access or a specific operating system to run the test suite
-
-        // @codeCoverageIgnoreStart
         stream_set_blocking($socket, 0);
         return $socket;
-        // @codeCoverageIgnoreEnd
     }
 
     /**
@@ -158,9 +134,9 @@ class Client extends EventEmitter
      * @param \React\EventLoop\LoopInterface $loop Event loop
      * @return \React\Stream\Stream
      */
-    protected function getStream($socket, LoopInterface $loop)
+    protected function getStream($socket)
     {
-        return new Stream($socket, $loop);
+        return new Stream($socket, $this->getLoop());
     }
 
     /**
@@ -171,9 +147,11 @@ class Client extends EventEmitter
     protected function addLogging(EventEmitter $emitter)
     {
         $logger = $this->getLogger();
-        $emitter->on('data', function($msg) use ($logger) {
+        $callback = function($msg) use ($logger) {
             $logger->debug($msg);
-        });
+        };
+        $emitter->on('data', $callback);
+        $emitter->on('error', $callback);
     }
 
     /**
@@ -231,8 +209,10 @@ class Client extends EventEmitter
      * Returns a callback for proxying IRC events from the read stream to IRC
      * listeners of the client.
      *
-     * @param \Phergie\Irc\Client\React\WriteStream $write
-     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @param \Phergie\Irc\Client\React\WriteStream $write Write stream
+     *        corresponding to the read stream on which the event occurred
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection on
+     *        which the event occurred
      * @return callable
      */
     protected function getReadCallback($write, $connection)
@@ -240,7 +220,41 @@ class Client extends EventEmitter
         $client = $this;
         $logger = $this->getLogger();
         return function($message) use ($client, $write, $connection, $logger) {
-            $client->emit('irc', array($message, $write, $connection, $logger));
+            $client->emit('irc.received', array($message, $write, $connection, $logger));
+        };
+    }
+
+    /**
+     * Returns a callback for proxying events from the write stream to IRC
+     * listeners of the client.
+     *
+     * @paran \Phergie\Irc\ConnectionInterface $connection Connection on which
+     *        the event occurred
+     * @return callable
+     */
+    protected function getWriteCallback($connection)
+    {
+        $client = $this;
+        $logger = $this->getLogger();
+        return function($message) use ($client, $connection, $logger) {
+            $client->emit('irc.sent', array($message, $connection, $logger));
+        };
+    }
+
+    /**
+     * Returns a callback for proxying connection error events to listeners of
+     * the client.
+     *
+     * @paran \Phergie\Irc\ConnectionInterface $connection Connection on which
+     *        the error occurred
+     * @return callable
+     */
+    protected function getErrorCallback($connection)
+    {
+        $client = $this;
+        $logger = $this->getLogger();
+        return function($message) use ($client, $connection, $logger) {
+            $client->emit('connect.error', array($message, $connection, $logger));
         };
     }
 
@@ -248,22 +262,27 @@ class Client extends EventEmitter
      * Initializes an IRC connection.
      *
      * @param \Phergie\Irc\ConnectionInterface $connection Metadata for connection to establish
-     * @param \React\EventLoop\LoopInterface $loop Event loop to listen for events on the connection
      * @throws \Phergie\Irc\Client\React\Exception if unable to establish the connection
      */
-    protected function connect(ConnectionInterface $connection, LoopInterface $loop)
+    public function addConnection(ConnectionInterface $connection)
     {
+        $this->emit('connect.before.each', array($connection));
+
         // Establish the socket connection
         $remote = $this->getRemote($connection);
         $context = $this->getContext($connection);
         $socket = $this->getSocket($remote, $context);
-        $stream = $this->getStream($socket, $loop);
+        $stream = $this->getStream($socket);
 
         // Configure streams to handle messages received from and sent to the server
         $read = $this->getReadStream();
         $write = $this->getWriteStream();
         $write->pipe($stream)->pipe($read);
-        $read->on('irc', $this->getReadCallback($write, $connection));
+        $read->on('irc.received', $this->getReadCallback($write, $connection));
+        $write->on('data', $this->getWriteCallback($connection));
+        $error = $this->getErrorCallback($connection);
+        $read->on('error', $error);
+        $write->on('error', $error);
 
         // Establish the user's identity to the server
         $password = $connection->getPassword();
@@ -279,45 +298,28 @@ class Client extends EventEmitter
         );
 
         $write->ircNick($connection->getNickname());
+
+        $this->emit('connect.after.each', array($connection));
     }
 
     /**
      * Executes the event loop, which continues running until no active
      * connections remain.
+     *
+     * @param \Phergie\Irc\ConnectionInterface|\Phergie\Irc\ConnectionInterface[] $connections
      */
-    public function run()
+    public function run($connections)
     {
-        $loop = $this->getLoop();
-        $this->emit('connect.before.all', array($this->connections));
-        foreach ($this->connections as $connection) {
-            $this->emit('connect.before.each', array($connection));
-            $this->connect($connection, $loop);
-            $this->emit('connect.after.each', array($connection));
+        if (!is_array($connections)) {
+            $connections = array($connections);
         }
-        $this->emit('connect.after.all', array($this->connections));
-        $loop->run();
-    }
 
-    /**
-     * Convenient shorthand for adding event listeners.
-     *
-     * $callback is a callback that accepts the following parameters:
-     * - $message is an associative array containing data for an event received
-     *   from the server as obtained by \Phergie\Irc\Parser.
-     * - $write is an instance of \Phergie\Irc\Client\React\WriteStream for
-     *   sending new events from the client to the server.
-     * - $connection is an instance of \Phergie\Irc\Connection containing
-     *   metadata for the connection on which the event occurred.
-     * - $logger is an instance of \Monolog\Logger for logging any relevant
-     *   events from the listener.
-     *
-     * @param callable $callback
-     */
-    public function addListener($callback)
-    {
-        if (!is_callable($callback)) {
-            throw new \InvalidArgumentException('$callback must be of type callable');
+        $this->emit('connect.before.all', array($connections));
+        foreach ($connections as $connection) {
+            $this->addConnection($connection);
         }
-        $this->on('irc', $callback);
+        $this->emit('connect.after.all', array($connections));
+
+        $this->getLoop()->run();
     }
 }

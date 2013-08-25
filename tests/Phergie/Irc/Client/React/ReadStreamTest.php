@@ -62,7 +62,7 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
         // modification of the $all parameter of consumeAll(), which is
         // received by reference, within the stub callback for consumeAll().
         // The most that can be tested here is that write() will retain the
-        // remainder of the data stream (i.e.  all of it if consumeAll() does
+        // remainder of the data stream (i.e. all of it if consumeAll() does
         // not modify it, which it won't if the stream does not contain a
         // complete message) after its first invocation of consumeAll(), then
         // prepend that remainder to the $data parameter value passed to it
@@ -89,7 +89,7 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
         $read
             ->expects($this->at(1))
             ->method('emit')
-            ->with('irc', array($parsed));
+            ->with('irc.received', array($parsed));
         $read->setParser($parser);
         $read->write($data1);
         $read->write($data2 . "\r\n");
@@ -128,7 +128,7 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
         $read
             ->expects($this->at(1))
             ->method('emit')
-            ->with('irc', array($parsed));
+            ->with('irc.received', array($parsed));
         $read->setParser($parser);
         $read->write($parsed['message']);
     }

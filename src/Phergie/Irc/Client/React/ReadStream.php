@@ -73,7 +73,7 @@ class ReadStream extends WritableStream
 
         foreach ($messages as $message) {
             $this->emit('data', array($message['message']));
-            $this->emit('irc', array($message));
+            $this->emit('irc.received', array($message));
         }
     }
 }
