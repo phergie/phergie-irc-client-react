@@ -530,6 +530,30 @@ class WriteStream extends ReadableStream implements GeneratorInterface
         $this->emit('data', array($msg));
         return $msg;
     }
+    
+    /**
+     * @param string $receivers 
+     * @param string $action
+     * @return string
+     */
+    public function ctcpAction($receivers, $action)
+    {
+        $msg = $this->getGenerator()->ctcpAction($receivers, $action);
+        $this->emit('data', array($msg));
+        return $msg;
+    }
+
+    /**
+     * @param string $nickname
+     * @param string $action
+     * @return string
+     */
+    public function ctcpActionResponse($nickname, $action)
+    {
+        $msg = $this->getGenerator()->ctcpActionResponse($nickname, $action);
+        $this->emit('data', array($msg));
+        return $msg;
+    }
 
     /**
      * @param string $receivers
