@@ -49,8 +49,8 @@ $client->run($connection);
 
 1. Create and configure an instance of the connection class, `\Phergie\Irc\Connection`, for each server the bot will connect to. See [phergie-irc-connection documentation](https://github.com/phergie/phergie-irc-connection#usage) for more information on configuring connection objects.
 2. Create an instance of the client class, `\Phergie\Irc\Client\React\Client`.
-3. Call the client object's `addConnection()` method with each connection object you created in step #1.
-4. Call the client object's `on()` method any number of times, each time specifying an event to monitor and a callback that will be executed whenever that event is received from the server.
+3. Call the client object's `on()` method any number of times, each time specifying an event to monitor and a callback that will be executed whenever that event is received from the server.
+4. Call the client object's `run()` method with a connection object or array of multiple connection objects created in step #1.
 
 ## Client Events
 
