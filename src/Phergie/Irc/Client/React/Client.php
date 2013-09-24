@@ -16,6 +16,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Phergie\Irc\ConnectionInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
 use React\Stream\Stream;
 
 /**
@@ -321,5 +322,61 @@ class Client extends EventEmitter
         $this->emit('connect.after.all', array($connections));
 
         $this->getLoop()->run();
+    }
+
+    /**
+     * Adds a one-time callback to execute after a specified amount of time has
+     * passed. Proxies to addTimer() implementation of the event loop
+     * implementation returned by getLoop().
+     *
+     * @param numeric $interval Number of seconds to wait before executing
+     *        callback
+     * @param callable $callback Callback to execute
+     * @return \React\Event\Timer\TimerInterface Added timer
+     */
+    public function addTimer($interval, $callback)
+    {
+        return $this->getLoop()->addTimer($interval, $callback);
+    }
+
+    /**
+     * Adds a recurring callback to execute on a specified interval. Proxies to
+     * addPeriodTimer() implementation of the event loop implementation
+     * returned by getLoop().
+     *
+     * @param numeric $interval Number of seconds to wait between executions of callback
+     * @param callable $callback Callback to execute
+     * @return \React\Event\Timer\TimerInterface Added timer
+     */
+    public function addPeriodicTimer($interval, $callback)
+    {
+        return $this->getLoop()->addPeriodicTimer($interval, $callback);
+    }
+
+    /**
+     * Cancels a specified timer created using addTimer() or
+     * addPeriodicTimer(). Proxies to the cancelTimer() implementation of the
+     * event loop implementation returned by getLoop().
+     *
+     * @param \React\Event\Timer\TimerInterface $timer Timer returned by
+     *        addTimer() or addPeriodicTimer()
+     */
+    public function cancelTimer(TimerInterface $timer)
+    {
+        $this->getLoop()->cancelTimer($timer);
+    }
+
+    /**
+     * Checks if a timer created using addTimer() or addPeriodicTimer() is
+     * active. Proxies to the isTimerActive() implementation of the event loop
+     * implementation returned by getLoop().
+     *
+     * @param \React\Event\Timer\TimerInterface $timer Timer returned by
+     *        addTimer() or addPeriodicTimer()
+     * @return boolean TRUE if the specified timer is active, FALSE otherwise
+     */
+    public function isTimerActive(TimerInterface $timer)
+    {
+        return $this->getLoop()->isTimerActive($timer);
     }
 }

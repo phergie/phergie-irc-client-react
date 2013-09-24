@@ -588,4 +588,87 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $callback = $method->invoke($client, $connection);
         $callback('msg');
     }
+
+    /**
+     * Returns a client stubbed for testing timer-related methods.
+     *
+     * @param \React\EventLoop\LoopInterface $loop
+     * @return \Phergie\Irc\Client\React\Client
+     */
+    protected function getClientForTimerTest(\React\EventLoop\LoopInterface $loop)
+    {
+        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('getLoop'));
+        $client
+            ->expects($this->any())
+            ->method('getLoop')
+            ->will($this->returnValue($loop));
+        return $client;
+    }
+
+    /**
+     * Data provider for testAddTimer().
+     *
+     * @return array
+     */
+    public function dataProviderTestAddTimer()
+    {
+        return array(
+            array('addTimer'),
+            array('addPeriodicTimer'),
+        );
+    }
+
+    /**
+     * Tests adding timers.
+     *
+     * @param string $method Method being tested
+     * @dataProvider dataProviderTestAddTimer
+     */
+    public function testAddTimers($method)
+    {
+        $interval = 5;
+        $callback = function() { };
+        $timer = $this->getMock('\React\Event\Timer\TimerInterface');
+
+        $loop = $this->getMockLoop();
+        $loop->expects($this->once())
+            ->method($method)
+            ->with($interval, $callback)
+            ->will($this->returnValue($timer));
+
+        $client = $this->getClientForTimerTest($loop);
+        $client->$method($interval, $callback);
+    }
+
+    /**
+     * Tests cancelTimer().
+     */
+    public function testCancelTimer()
+    {
+        $timer = $this->getMock('\React\EventLoop\Timer\TimerInterface');
+
+        $loop = $this->getMockLoop();
+        $loop->expects($this->once())
+            ->method('cancelTimer')
+            ->with($timer);
+
+        $client = $this->getClientForTimerTest($loop);
+        $client->cancelTimer($timer);
+    }
+
+    /**
+     * Tests isTimerActive().
+     */
+    public function testIsTimerActive()
+    {
+        $timer = $this->getMock('\React\EventLoop\Timer\TimerInterface');
+
+        $loop = $this->getMockLoop();
+        $loop->expects($this->once())
+            ->method('isTimerActive')
+            ->with($timer);
+
+        $client = $this->getClientForTimerTest($loop);
+        $client->isTimerActive($timer);
+    }
 }

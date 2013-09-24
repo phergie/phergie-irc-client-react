@@ -4,8 +4,8 @@
         "phergie/phergie-irc-parser": "dev-master",
         "phergie/phergie-irc-generator": "dev-master",
         "phergie/phergie-irc-connection": "dev-master",
-        "react/event-loop": "0.2.*",
-        "react/stream": "0.2.*",
+        "react/event-loop": "0.3.*",
+        "react/stream": "0.3.*",
         "monolog/monolog": "~1.2",
         "phpunit/phpunit": "3.7.*"
     },

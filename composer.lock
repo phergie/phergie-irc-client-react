@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "a5cee044835754fbf4c4aaac0981fa19",
+    "hash": "da5326750d7f68580c86a4448e53f8c5",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -56,12 +56,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "7a8844d4db868cf20040facb8c3413802dd0ec9b"
+                "reference": "c766d624e9993e1a743dcea0f887b068d8401ef5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/7a8844d4db868cf20040facb8c3413802dd0ec9b",
-                "reference": "7a8844d4db868cf20040facb8c3413802dd0ec9b",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c766d624e9993e1a743dcea0f887b068d8401ef5",
+                "reference": "c766d624e9993e1a743dcea0f887b068d8401ef5",
                 "shasum": ""
             },
             "require": {
@@ -71,6 +71,7 @@
             "require-dev": {
                 "doctrine/couchdb": "dev-master",
                 "mlehner/gelf-php": "1.0.*",
+                "phpunit/phpunit": "~3.7.0",
                 "raven/raven": "0.5.*"
             },
             "suggest": {
@@ -91,7 +92,7 @@
                     "Monolog": "src/"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -110,7 +111,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2013-08-09 12:12:38"
+            "time": "2013-09-23 09:55:45"
         },
         {
             "name": "phergie/phergie-irc-connection",
@@ -118,12 +119,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
-                "reference": "1.1.0"
+                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/1.1.0",
-                "reference": "1.1.0",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/96521084b6931df13cbcd77a40f9fd7c4cd79d18",
+                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18",
                 "shasum": ""
             },
             "require": {
@@ -135,7 +136,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -154,12 +155,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-generator.git",
-                "reference": "1.1.0"
+                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/1.1.0",
-                "reference": "1.1.0",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
+                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
                 "shasum": ""
             },
             "require": {
@@ -171,7 +172,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -180,7 +181,7 @@
                 "generator",
                 "irc"
             ],
-            "time": "2013-07-15 16:34:57"
+            "time": "2013-09-20 01:15:59"
         },
         {
             "name": "phergie/phergie-irc-parser",
@@ -188,12 +189,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser.git",
-                "reference": "3e9d55650602d80227eed5f3452232ead858cfa4"
+                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/3e9d55650602d80227eed5f3452232ead858cfa4",
-                "reference": "3e9d55650602d80227eed5f3452232ead858cfa4",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
+                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
                 "shasum": ""
             },
             "require": {
@@ -205,7 +206,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -214,7 +215,7 @@
                 "irc",
                 "parser"
             ],
-            "time": "2013-08-07 00:54:23"
+            "time": "2013-09-20 00:50:19"
         },
         {
             "name": "psr/log",
@@ -261,12 +262,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/event-loop.git",
-                "reference": "v0.3.3"
+                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/v0.3.3",
-                "reference": "v0.3.3",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/49208fa3a15c9eae4adf8351ee9caa4064fe550d",
+                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d",
                 "shasum": ""
             },
             "require": {
@@ -287,7 +288,7 @@
                     "React\\EventLoop": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -304,12 +305,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream.git",
-                "reference": "v0.3.3"
+                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/stream/zipball/v0.3.3",
-                "reference": "v0.3.3",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/b72900ab00513b591fb101faecad38f9c8eab8da",
+                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da",
                 "shasum": ""
             },
             "require": {
@@ -331,7 +332,7 @@
                     "React\\Stream": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "notification-url": "http://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],

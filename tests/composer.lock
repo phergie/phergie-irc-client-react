@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "385b9b9a51ad9641af0f1bc2390d2685",
+    "hash": "902c1bca57d393d24835f7eab46f34ff",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -113,12 +113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
-                "reference": "1.1.0"
+                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/1.1.0",
-                "reference": "1.1.0",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/96521084b6931df13cbcd77a40f9fd7c4cd79d18",
+                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18",
                 "shasum": ""
             },
             "require": {
@@ -149,12 +149,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-generator.git",
-                "reference": "81e82fd64187d64295336251bd218b7f640f30be"
+                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/81e82fd64187d64295336251bd218b7f640f30be",
-                "reference": "81e82fd64187d64295336251bd218b7f640f30be",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
+                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
                 "shasum": ""
             },
             "require": {
@@ -175,7 +175,7 @@
                 "generator",
                 "irc"
             ],
-            "time": "2013-08-13 02:41:36"
+            "time": "2013-09-20 01:15:59"
         },
         {
             "name": "phergie/phergie-irc-parser",
@@ -183,12 +183,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser.git",
-                "reference": "d36f74fc1bd93f4e05606ec007f6447bcc30ea62"
+                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/d36f74fc1bd93f4e05606ec007f6447bcc30ea62",
-                "reference": "d36f74fc1bd93f4e05606ec007f6447bcc30ea62",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
+                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
                 "shasum": ""
             },
             "require": {
@@ -209,20 +209,20 @@
                 "irc",
                 "parser"
             ],
-            "time": "2013-08-13 12:34:23"
+            "time": "2013-09-20 00:50:19"
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "1.2.12",
+            "version": "1.2.13",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "1.2.12"
+                "reference": "466e7cd2554b4e264c9e3f31216d25ac0e5f3d94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/1.2.12",
-                "reference": "1.2.12",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/466e7cd2554b4e264c9e3f31216d25ac0e5f3d94",
+                "reference": "466e7cd2554b4e264c9e3f31216d25ac0e5f3d94",
                 "shasum": ""
             },
             "require": {
@@ -270,7 +270,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2013-07-06 06:26:16"
+            "time": "2013-09-10 08:14:32"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -407,16 +407,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "1.2.0"
+                "reference": "5220af2a7929aa35cf663d97c89ad3d50cf5fa3e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/1.2.0",
-                "reference": "1.2.0",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/5220af2a7929aa35cf663d97c89ad3d50cf5fa3e",
+                "reference": "5220af2a7929aa35cf663d97c89ad3d50cf5fa3e",
                 "shasum": ""
             },
             "require": {
@@ -453,20 +453,20 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2013-08-04 05:57:48"
+            "time": "2013-09-13 04:58:23"
         },
         {
             "name": "phpunit/phpunit",
-            "version": "3.7.24",
+            "version": "3.7.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "3.7.24"
+                "reference": "4b024e753e3421837afbcca962c8724c58b39376"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/3.7.24",
-                "reference": "3.7.24",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4b024e753e3421837afbcca962c8724c58b39376",
+                "reference": "4b024e753e3421837afbcca962c8724c58b39376",
                 "shasum": ""
             },
             "require": {
@@ -527,7 +527,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2013-08-09 06:58:24"
+            "time": "2013-09-16 03:09:52"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -618,17 +618,17 @@
         },
         {
             "name": "react/event-loop",
-            "version": "v0.2.7",
+            "version": "v0.3.3",
             "target-dir": "React/EventLoop",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/event-loop",
-                "reference": "v0.2.7"
+                "url": "https://github.com/reactphp/event-loop.git",
+                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/event-loop/archive/v0.2.7.zip",
-                "reference": "v0.2.7",
+                "url": "https://api.github.com/repos/reactphp/event-loop/zipball/49208fa3a15c9eae4adf8351ee9caa4064fe550d",
+                "reference": "49208fa3a15c9eae4adf8351ee9caa4064fe550d",
                 "shasum": ""
             },
             "require": {
@@ -641,7 +641,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2-dev"
+                    "dev-master": "0.3-dev"
                 }
             },
             "autoload": {
@@ -657,21 +657,21 @@
             "keywords": [
                 "event-loop"
             ],
-            "time": "2013-01-05 11:41:26"
+            "time": "2013-07-08 22:38:22"
         },
         {
             "name": "react/stream",
-            "version": "v0.2.7",
+            "version": "v0.3.3",
             "target-dir": "React/Stream",
             "source": {
                 "type": "git",
-                "url": "https://github.com/reactphp/stream",
-                "reference": "v0.2.7"
+                "url": "https://github.com/reactphp/stream.git",
+                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/reactphp/stream/archive/v0.2.7.zip",
-                "reference": "v0.2.7",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/b72900ab00513b591fb101faecad38f9c8eab8da",
+                "reference": "b72900ab00513b591fb101faecad38f9c8eab8da",
                 "shasum": ""
             },
             "require": {
@@ -679,13 +679,13 @@
                 "php": ">=5.3.3"
             },
             "suggest": {
-                "react/event-loop": "0.2.*",
-                "react/promise": "1.0.*"
+                "react/event-loop": "0.3.*",
+                "react/promise": "~1.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.2-dev"
+                    "dev-master": "0.3-dev"
                 }
             },
             "autoload": {
@@ -702,21 +702,21 @@
                 "pipe",
                 "stream"
             ],
-            "time": "2012-12-14 00:58:14"
+            "time": "2013-07-09 00:44:12"
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.3.3",
+            "version": "v2.3.4",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "v2.3.3"
+                "reference": "5a279f1b5f5e1045a6c432354d9ea727ff3a9847"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/v2.3.3",
-                "reference": "v2.3.3",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/5a279f1b5f5e1045a6c432354d9ea727ff3a9847",
+                "reference": "5a279f1b5f5e1045a6c432354d9ea727ff3a9847",
                 "shasum": ""
             },
             "require": {
@@ -749,7 +749,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2013-07-21 12:12:18"
+            "time": "2013-08-24 15:26:22"
         }
     ],
     "packages-dev": [
