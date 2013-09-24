@@ -192,6 +192,36 @@ $client->on('irc.sent', function($message, \Phergie\Irc\ConnectionInterface $con
 });
 ```
 
+## Timers
+
+In some cases, it's desirable to execute a callback on a specified interval rather than in response to a specific event.
+
+### One-Time Callbacks
+
+To add one-time callbacks that execute after a specified amount of time (in seconds):
+
+```php
+<?php
+$client->addTimer(5, function() {
+    // ...
+});
+```
+
+The above example will execute the specified callback at least 5 seconds after it's added.
+
+### Recurring Callbacks
+
+To add recurring callbacks that execute on a specified interval (in seconds):
+
+```php
+<?php
+$client->addPeriodicTimer(5, function() {
+    // ...
+});
+```
+
+The above example will execute the specified callback at least every 5 seconds after it's added.
+
 ## Connection Options
 
 ### force-ip4
