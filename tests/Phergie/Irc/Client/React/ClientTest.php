@@ -220,11 +220,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $method = $this->getMethod('getSocket');
 
         try {
-            $method->invoke($client, '', array());
+            $method->invoke($client, 'tcp://0.0.0.0:0', array());
             $this->fail('Expected exception not thrown');
         } catch (Exception $e) {
             $this->assertEquals(Exception::ERR_CONNECTION_ATTEMPT_FAILED, $e->getCode());
-            $this->assertEquals('Unable to connect: socket error 0 Failed to parse address ""', $e->getMessage());
+            $this->assertEquals(
+                'Unable to connect to remote tcp://0.0.0.0:0: socket error 111 Connection refused',
+                $e->getMessage()
+            );
         }
     }
 
@@ -420,6 +423,58 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     protected function getMockLoop()
     {
         return $this->getMock('\React\EventLoop\LoopInterface', array(), array(), '', false);
+    }
+
+    /**
+     * Tests addConnection() when getSocket() throws an exception.
+     */
+    public function testAddConnnectionWithException()
+    {
+        $connection = $this->getMock('\Phergie\Irc\Connection', array(), array(), '', false);
+        $writeStream = $this->getMock('\Phergie\Irc\Client\React\WriteStream', array(), array(), '', false);
+        $logger = $this->getMockLogger();
+        $remote = 'REMOTE';
+        $context = array();
+        $exception = new Exception(
+            'Unable to connect to remote ' . $remote . ': socket error errno errstr',
+            Exception::ERR_CONNECTION_ATTEMPT_FAILED
+        );
+
+        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('getRemote', 'getContext', 'getSocket', 'getLogger', 'emit'));
+
+        $client
+            ->expects($this->once())
+            ->method('getRemote')
+            ->with($connection)
+            ->will($this->returnValue($remote));
+        $client
+            ->expects($this->once())
+            ->method('getContext')
+            ->with($connection)
+            ->will($this->returnValue($context));
+        $client
+            ->expects($this->once())
+            ->method('getSocket')
+            ->with($remote, $context)
+            ->will($this->throwException($exception));
+        $client
+            ->expects($this->once())
+            ->method('getLogger')
+            ->will($this->returnValue($logger));
+        $client
+            ->expects($this->at(0))
+            ->method('emit')
+            ->with('connect.before.each', array($connection));
+        $client
+            ->expects($this->at(5))
+            ->method('emit')
+            ->with('connect.error', array($exception->getMessage(), $connection, $logger));
+        $client
+            ->expects($this->at(6))
+            ->method('emit')
+            ->with('connect.after.each', array($connection));
+
+        $client->addConnection($connection);
     }
 
     /**

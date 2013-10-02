@@ -85,7 +85,8 @@ class Client extends EventEmitter
 
         if (!$socket) {
             throw new Exception(
-                'Unable to connect: socket error ' . $errno . ' ' . $errstr,
+                'Unable to connect to remote ' . $remote .
+                    ': socket error ' . $errno . ' ' . $errstr,
                 Exception::ERR_CONNECTION_ATTEMPT_FAILED
             );
         }
@@ -262,6 +263,11 @@ class Client extends EventEmitter
     /**
      * Initializes an IRC connection.
      *
+     * Emits connect.before.each and connect.after.each events before and
+     * after connection attempts are established, respectively.
+     *
+     * Emits a connect.error event if a connection attempt fails.
+     *
      * @param \Phergie\Irc\ConnectionInterface $connection Metadata for connection to establish
      * @throws \Phergie\Irc\Client\React\Exception if unable to establish the connection
      */
@@ -272,33 +278,44 @@ class Client extends EventEmitter
         // Establish the socket connection
         $remote = $this->getRemote($connection);
         $context = $this->getContext($connection);
-        $socket = $this->getSocket($remote, $context);
-        $stream = $this->getStream($socket);
+        try {
+            $socket = $this->getSocket($remote, $context);
+            $stream = $this->getStream($socket);
 
-        // Configure streams to handle messages received from and sent to the server
-        $read = $this->getReadStream();
-        $write = $this->getWriteStream();
-        $write->pipe($stream)->pipe($read);
-        $read->on('irc.received', $this->getReadCallback($write, $connection));
-        $write->on('data', $this->getWriteCallback($connection));
-        $error = $this->getErrorCallback($connection);
-        $read->on('error', $error);
-        $write->on('error', $error);
+            // Configure streams to handle messages received from and sent to the server
+            $read = $this->getReadStream();
+            $write = $this->getWriteStream();
+            $write->pipe($stream)->pipe($read);
+            $read->on('irc.received', $this->getReadCallback($write, $connection));
+            $write->on('data', $this->getWriteCallback($connection));
+            $error = $this->getErrorCallback($connection);
+            $read->on('error', $error);
+            $write->on('error', $error);
 
-        // Establish the user's identity to the server
-        $password = $connection->getPassword();
-        if ($password) {
-            $write->ircPass($password);
+            // Establish the user's identity to the server
+            $password = $connection->getPassword();
+            if ($password) {
+                $write->ircPass($password);
+            }
+
+            $write->ircUser(
+                $connection->getUsername(),
+                $connection->getHostname(),
+                $connection->getServername(),
+                $connection->getRealname()
+            );
+
+            $write->ircNick($connection->getNickname());
+        } catch (Exception $e) {
+            $this->emit(
+                'connect.error',
+                array(
+                    $e->getMessage(),
+                    $connection,
+                    $this->getLogger()
+                )
+            );
         }
-
-        $write->ircUser(
-            $connection->getUsername(),
-            $connection->getHostname(),
-            $connection->getServername(),
-            $connection->getRealname()
-        );
-
-        $write->ircNick($connection->getNickname());
 
         $this->emit('connect.after.each', array($connection));
     }
