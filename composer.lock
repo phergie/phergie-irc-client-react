@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "da5326750d7f68580c86a4448e53f8c5",
+    "hash": "14c4163441da052fb67288c46b053558",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -56,12 +56,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "c766d624e9993e1a743dcea0f887b068d8401ef5"
+                "reference": "b5fa119527f25b787fbb20e75593e0671b0ea079"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c766d624e9993e1a743dcea0f887b068d8401ef5",
-                "reference": "c766d624e9993e1a743dcea0f887b068d8401ef5",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/b5fa119527f25b787fbb20e75593e0671b0ea079",
+                "reference": "b5fa119527f25b787fbb20e75593e0671b0ea079",
                 "shasum": ""
             },
             "require": {
@@ -92,7 +92,7 @@
                     "Monolog": "src/"
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -111,11 +111,11 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2013-09-23 09:55:45"
+            "time": "2013-10-03 15:23:01"
         },
         {
             "name": "phergie/phergie-irc-connection",
-            "version": "dev-master",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
@@ -136,7 +136,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -151,16 +151,16 @@
         },
         {
             "name": "phergie/phergie-irc-generator",
-            "version": "dev-master",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-generator.git",
-                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1"
+                "reference": "d03ec9998344caeb360956e62da6214e071b4b49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
-                "reference": "a2f45a9ffa4d319e6cef36bb238b5a3c3d397fc1",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/d03ec9998344caeb360956e62da6214e071b4b49",
+                "reference": "d03ec9998344caeb360956e62da6214e071b4b49",
                 "shasum": ""
             },
             "require": {
@@ -172,7 +172,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -181,20 +181,20 @@
                 "generator",
                 "irc"
             ],
-            "time": "2013-09-20 01:15:59"
+            "time": "2013-10-05 12:03:37"
         },
         {
             "name": "phergie/phergie-irc-parser",
-            "version": "dev-master",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser.git",
-                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d"
+                "reference": "9d9b7e596b78214b73c153a35c1e7498470c2d14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
-                "reference": "a89e05e8a8ccea998d7b0169645ce6c4f6b5344d",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/9d9b7e596b78214b73c153a35c1e7498470c2d14",
+                "reference": "9d9b7e596b78214b73c153a35c1e7498470c2d14",
                 "shasum": ""
             },
             "require": {
@@ -206,7 +206,7 @@
                     "Phergie": "src"
                 }
             },
-            "notification-url": "http://packagist.org/downloads/",
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "BSD-2-Clause"
             ],
@@ -215,7 +215,7 @@
                 "irc",
                 "parser"
             ],
-            "time": "2013-09-20 00:50:19"
+            "time": "2013-10-05 11:55:30"
         },
         {
             "name": "psr/log",
@@ -351,11 +351,9 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "phergie/phergie-irc-parser": 20,
-        "phergie/phergie-irc-generator": 20,
-        "phergie/phergie-irc-connection": 20
-    },
+    "stability-flags": [
+
+    ],
     "platform": {
         "php": ">=5.3.3"
     },
