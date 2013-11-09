@@ -26,7 +26,7 @@ use React\Stream\Stream;
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-class Client extends EventEmitter
+class Client extends EventEmitter implements ClientInterface
 {
     /**
      * Event loop
