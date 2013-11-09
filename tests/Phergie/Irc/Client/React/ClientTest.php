@@ -224,8 +224,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $this->fail('Expected exception not thrown');
         } catch (Exception $e) {
             $this->assertEquals(Exception::ERR_CONNECTION_ATTEMPT_FAILED, $e->getCode());
-            $this->assertEquals(
-                'Unable to connect to remote tcp://0.0.0.0:0: socket error 111 Connection refused',
+            $this->assertStringStartsWith(
+                'Unable to connect to remote tcp://0.0.0.0:0: socket error ',
                 $e->getMessage()
             );
         }
