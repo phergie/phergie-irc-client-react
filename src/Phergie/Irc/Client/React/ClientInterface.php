@@ -10,6 +10,7 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Phergie\Irc\ConnectionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
