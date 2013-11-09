@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "14c4163441da052fb67288c46b053558",
+    "hash": "c2165928e4bc1538c6fe7ba7a33e35b7",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -56,12 +56,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "b5fa119527f25b787fbb20e75593e0671b0ea079"
+                "reference": "a5010756d905264ea2b3f7f27c7df22fb9a3bd8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/b5fa119527f25b787fbb20e75593e0671b0ea079",
-                "reference": "b5fa119527f25b787fbb20e75593e0671b0ea079",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/a5010756d905264ea2b3f7f27c7df22fb9a3bd8e",
+                "reference": "a5010756d905264ea2b3f7f27c7df22fb9a3bd8e",
                 "shasum": ""
             },
             "require": {
@@ -111,7 +111,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2013-10-03 15:23:01"
+            "time": "2013-11-04 08:48:35"
         },
         {
             "name": "phergie/phergie-irc-connection",
