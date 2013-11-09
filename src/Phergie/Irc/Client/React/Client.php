@@ -14,6 +14,7 @@ use Evenement\EventEmitter;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use Phergie\Irc\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
@@ -37,7 +38,7 @@ class Client extends EventEmitter
     /**
      * Logging stream
      *
-     * @var \Phergie\Irc\Client\React\LoggerStream
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -184,7 +185,7 @@ class Client extends EventEmitter
     /**
      * Returns a stream instance for logging data on the socket connection.
      *
-     * @return \Monolog\Logger
+     * @return \Psr\Log\LoggerInterface
      */
     public function getLogger()
     {
@@ -200,9 +201,9 @@ class Client extends EventEmitter
     /**
      * Sets a logger for logging data on the socket connection.
      *
-     * @param \Monolog\Logger
+     * @param \Psr\Log\LoggerInterface
      */
-    public function setLogger(Logger $logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }

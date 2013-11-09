@@ -41,11 +41,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns a mock logger.
      *
-     * @return \Monolog\Logger
+     * @return \Psr\Log\LoggerInterface
      */
     protected function getMockLogger()
     {
-        return $this->getMock('\Monolog\Logger', array(), array(), '', false);
+        return $this->getMock('\Psr\Log\LoggerInterface', array(), array(), '', false);
     }
 
     /**
@@ -66,7 +66,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $client = new Client;
         $logger = $client->getLogger();
-        $this->assertInstanceOf('\Monolog\Logger', $logger);
+        $this->assertInstanceOf('\Psr\Log\LoggerInterface', $logger);
         $this->assertSame($logger, $client->getLogger());
     }
 
