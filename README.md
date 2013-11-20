@@ -34,10 +34,10 @@ $connection = new \Phergie\Irc\Connection();
 
 $client = new \Phergie\Irc\Client\React\Client();
 $client->on('irc.received', function($message, $write, $connection, $logger) {
-    if ($message['type'] !== 'JOIN') {
+    if ($message['command'] !== 'JOIN') {
         return;
     }
-    $channel = $message['params']['channel'];
+    $channel = $message['params']['channels'];
     $nick = $message['nick'];
     $write->ircPrivmsg($channel, 'Welcome ' . $nick . '!');
 });
