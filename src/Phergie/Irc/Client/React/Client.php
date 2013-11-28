@@ -276,12 +276,19 @@ class Client extends EventEmitter implements ClientInterface
     {
         $this->emit('connect.before.each', array($connection));
 
+        // Terminate any preexisting connection
+        $stream = $connection->getOption('stream');
+        if ($stream !== null) {
+            $this->getLoop()->removeStream($stream);
+        }
+
         // Establish the socket connection
         $remote = $this->getRemote($connection);
         $context = $this->getContext($connection);
         try {
             $socket = $this->getSocket($remote, $context);
             $stream = $this->getStream($socket);
+            $connection->setOption('stream', $stream);
 
             // Configure streams to handle messages received from and sent to the server
             $read = $this->getReadStream();

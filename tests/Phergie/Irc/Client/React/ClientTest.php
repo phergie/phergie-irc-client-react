@@ -307,6 +307,16 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Returns a mock stream.
+     *
+     * @return \React\Stream\Stream
+     */
+    protected function getMockStream()
+    {
+        return $this->getMock('\React\Stream\Stream', array(), array(), '', false);
+    }
+
+    /**
      * Returns a mock client for testing addConnection().
      *
      * @param \Phergie\Irc\ConnectionInterface $connection
@@ -334,7 +344,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->method('on')
             ->with('error', $errorCallback);
 
-        $stream = $this->getMock('\React\Stream\Stream', array(), array(), '', false);
+        $stream = $this->getMockStream();
         $stream
             ->expects($this->once())
             ->method('pipe')
@@ -360,10 +370,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             ->expects($this->at(0))
             ->method('emit')
             ->with('connect.before.each', array($connection));
-        $client
-            ->expects($this->at(8))
-            ->method('emit')
-            ->with('connect.after.each', array($connection));
         $client
             ->expects($this->any())
             ->method('getLoop')
@@ -486,6 +492,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $writeStream = $this->getMockWriteStreamForAddConnection();
         $loop = $this->getMockLoop();
         $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
+        $client
+            ->expects($this->at(8))
+            ->method('emit')
+            ->with('connect.after.each', array($connection));
         $client->addConnection($connection);
     }
 
@@ -508,6 +518,42 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         $loop = $this->getMockLoop();
         $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
+        $client
+            ->expects($this->at(8))
+            ->method('emit')
+            ->with('connect.after.each', array($connection));
+        $client->addConnection($connection);
+    }
+
+    /**
+     * Tests addConnection() with a previously added connection.
+     */
+    public function testAddConnectionWithPreviouslyAddedConnection()
+    {
+        $stream = $this->getMockStream();
+        $loop = $this->getMockLoop();
+        $writeStream = $this->getMockWriteStreamForAddConnection();
+
+        $connection = $this->getMockConnectionForAddConnection();
+        $connection
+            ->expects($this->once())
+            ->method('getOption')
+            ->with('stream')
+            ->will($this->returnValue($stream));
+        $connection
+            ->expects($this->once())
+            ->method('setOption')
+            ->with('stream', $this->logicalAnd($this->isInstanceOf('\React\Stream\Stream'), $this->logicalNot($this->identicalTo($stream))));
+        $loop
+            ->expects($this->once())
+            ->method('removeStream')
+            ->with($stream);
+
+        $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
+        $client
+            ->expects($this->at(9))
+            ->method('emit')
+            ->with('connect.after.each', array($connection));
         $client->addConnection($connection);
     }
 
