@@ -190,6 +190,9 @@ class Client extends EventEmitter implements ClientInterface
     public function getLogger()
     {
         if (!$this->logger) {
+            if (!defined('STDERR')) {
+                define('STDERR', fopen('php://stderr', 'w'));
+            }
             $handler = new StreamHandler(STDERR, Logger::DEBUG);
             $handler->setFormatter(new LineFormatter('%datetime% %level_name% %message%'));
             $this->logger = new Logger(get_class($this));
