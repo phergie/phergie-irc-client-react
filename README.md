@@ -130,11 +130,9 @@ $client->on('connect.after.each', function(\Phergie\Irc\ConnectionInterface $con
 
 Emitted when an error is encountered on a connection.
 
-This can be useful for re-establishing a connection if it is unexpectedly terminated.
-
 #### Parameters
 
-* `string $message` - message describing the error encountered
+* `Exception $exception ` - exception describing the error that encountered
 * `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection on which the event occurred and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
 * `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
 
@@ -142,7 +140,27 @@ This can be useful for re-establishing a connection if it is unexpectedly termin
 
 ```php
 <?php
-$client->on('connect.error', function($message, \Phergie\Irc\ConnectionInterface $connection, \Monolog\Logger $logger) use ($client) {
+$client->on('connect.error', function(\Exception $message, \Phergie\Irc\ConnectionInterface $connection, \Monolog\Logger $logger) use ($client) {
+    $logger->debug('Connection to ' . $connection->getServerHostname() . ' lost: ' . $e->getMessage());
+});
+```
+
+### connect.end
+
+Emitted when a connection is terminated.
+
+This can be useful for re-establishing a connection if it is unexpectedly terminated.
+
+#### Parameters
+
+* `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection that was terminated and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
+* `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+
+#### Example
+
+```php
+<?php
+$client->on('connect.end', function(\Phergie\Irc\ConnectionInterface $connection, \Monolog\Logger $logger) use ($client) {
     $logger->debug('Connection to ' . $connection->getServerHostname() . ' lost, attempting to reconnect');
     $client->addConnection($connection);
 });

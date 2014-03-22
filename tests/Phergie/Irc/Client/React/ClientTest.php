@@ -335,6 +335,27 @@ EOF;
     }
 
     /**
+     * Tests that the client emits an event when a connection is terminated.
+     */
+    public function testEndCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->client->getLogger();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::verify($writeStream)->on('end', Phake::capture($callback));
+        $callback();
+        Phake::verify($this->client)->emit('connect.end', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(2, $params);
+        $this->assertSame($connection, $params[0]);
+        $this->assertSame($logger, $params[1]);
+    }
+
+    /**
      * Tests run() with multiple connections.
      */
     public function testRunWithMultipleConnections()

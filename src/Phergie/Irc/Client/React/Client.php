@@ -262,8 +262,24 @@ class Client extends EventEmitter implements ClientInterface
     {
         $client = $this;
         $logger = $this->getLogger();
-        return function($message) use ($client, $connection, $logger) {
-            $client->emit('connect.error', array($message, $connection, $logger));
+        return function($exception) use ($client, $connection, $logger) {
+            $client->emit('connect.error', array($exception, $connection, $logger));
+        };
+    }
+
+    /**
+     * Returns a callback for when a connection is terminated, whether
+     * explicitly by the bot or server or as a result of loss of connectivity.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection Terminated connection
+     * @return callable
+     */
+    protected function getEndCallback(ConnectionInterface $connection)
+    {
+        $client = $this;
+        $logger = $this->getLogger();
+        return function() use ($client, $connection, $logger) {
+            $client->emit('connect.end', array($connection, $logger));
         };
     }
 
@@ -284,6 +300,7 @@ class Client extends EventEmitter implements ClientInterface
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($connection));
+        $write->on('end', $this->getEndCallback($connection));
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
         $write->on('error', $error);
