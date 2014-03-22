@@ -37,6 +37,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     private $client;
 
     /**
+     * Test IRC message
+     * @var array
+     */
+    private $message = array(
+        'command' => 'PRIVMSG',
+        'params' => array(
+            'receivers' => 'Wiz',
+            'text' => 'Hello',
+            'all' => 'Wiz :Hello',
+        ),
+        'message' => "PRIVMSG Wiz :Hello\r\n",
+    );
+
+    /**
      * Performs common setup used across most tests.
      */
     public function setUp()
@@ -276,26 +290,17 @@ EOF;
         $logger = $this->client->getLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        $message = array(
-            'command' => 'PRIVMSG',
-            'params' => array(
-                'receivers' => 'Wiz',
-                'text' => 'Hello',
-                'all' => 'Wiz :Hello',
-            ),
-            'message' => "PRIVMSG Wiz :Hello\r\n",
-        );
         Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
         Phake::when($this->client)->getReadStream()->thenReturn($readStream);
 
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
-        $callback($message);
+        $callback($this->message);
         Phake::verify($this->client)->emit('irc.received', Phake::capture($params));
         $this->assertInternalType('array', $params);
         $this->assertCount(4, $params);
-        $this->assertSame($message, $params[0]);
+        $this->assertSame($this->message, $params[0]);
         $this->assertInstanceOf('\Phergie\Irc\Client\React\WriteStream', $params[1]);
         $this->assertSame($connection, $params[2]);
         $this->assertSame($logger, $params[3]);
@@ -310,26 +315,17 @@ EOF;
         $logger = $this->client->getLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        $message = array(
-            'command' => 'PRIVMSG',
-            'params' => array(
-                'receivers' => 'Wiz',
-                'text' => 'Hello',
-                'all' => 'Wiz :Hello',
-            ),
-            'message' => "PRIVMSG Wiz :Hello\r\n",
-        );
         Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
         Phake::when($this->client)->getReadStream()->thenReturn($readStream);
 
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('error', Phake::capture($callback));
-        $callback($message);
+        $callback($this->message);
         Phake::verify($this->client)->emit('connect.error', Phake::capture($params));
         $this->assertInternalType('array', $params);
         $this->assertCount(3, $params);
-        $this->assertSame($message, $params[0]);
+        $this->assertSame($this->message, $params[0]);
         $this->assertSame($connection, $params[1]);
         $this->assertSame($logger, $params[2]);
     }
