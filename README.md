@@ -265,10 +265,10 @@ $connection->setOption('transport', 'ssl');
 To run the unit test suite:
 
 ```
-cd tests
 curl -s https://getcomposer.org/installer | php
 php composer.phar install
-./vendor/bin/phpunit
+cd tests
+../vendor/bin/phpunit
 ```
 
 ## License
