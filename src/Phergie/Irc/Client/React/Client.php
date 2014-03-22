@@ -224,7 +224,7 @@ class Client extends EventEmitter implements ClientInterface
      *        which the event occurred
      * @return callable
      */
-    protected function getReadCallback($write, $connection)
+    protected function getReadCallback(WriteStream $write, ConnectionInterface $connection)
     {
         $client = $this;
         $logger = $this->getLogger();
@@ -241,7 +241,7 @@ class Client extends EventEmitter implements ClientInterface
      *        the event occurred
      * @return callable
      */
-    protected function getWriteCallback($connection)
+    protected function getWriteCallback(ConnectionInterface $connection)
     {
         $client = $this;
         $logger = $this->getLogger();
@@ -258,7 +258,7 @@ class Client extends EventEmitter implements ClientInterface
      *        the error occurred
      * @return callable
      */
-    protected function getErrorCallback($connection)
+    protected function getErrorCallback(ConnectionInterface $connection)
     {
         $client = $this;
         $logger = $this->getLogger();
