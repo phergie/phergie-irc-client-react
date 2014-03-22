@@ -7,7 +7,8 @@
         "react/event-loop": "0.3.*",
         "react/stream": "0.3.*",
         "monolog/monolog": "~1.2",
-        "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.7.*",
+        "phake/phake": "2.0.0-alpha4"
     },
     "autoload": {
         "psr-0": {
