@@ -10,6 +10,12 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
+use Phake;
+use React\EventLoop\LoopInterface;
+
 /**
  * Tests for \Phergie\Irc\Client\React\Client.
  *
@@ -19,14 +25,52 @@ namespace Phergie\Irc\Client\React;
 class ClientTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * Port on which to test client/server stream code
+     * @var string
+     */
+    private $port = '6667';
+
+    /**
+     * Instance of the class under test
+     * @var \Phergie\Irc\Client\React\Client
+     */
+    private $client;
+
+    /**
+     * Performs common setup used across most tests.
+     */
+    public function setUp()
+    {
+        // Set up a local mock server to listen on a particular port so that
+        // code for establishing a client connection via PHP streams can be
+        // tested
+        $this->server = stream_socket_server('tcp://0.0.0.0:' . $this->port, $errno, $errstr);
+        stream_set_blocking($this->server, 0);
+        if (!$this->server) {
+            $this->markTestSkipped('Cannot listen on port ' . $this->port);
+        }
+
+        // Instantiate the class under test
+        $this->client = Phake::partialMock('\Phergie\Irc\Client\React\Client');
+    }
+
+    /**
+     * Performs common cleanup used across most tests.
+     */
+    public function tearDown()
+    {
+        // Shut down the mock server connection
+        fclose($this->server);
+    }
+
+    /**
      * Tests setLoop().
      */
     public function testSetLoop()
     {
-        $client = new Client;
-        $loop = $this->getMock('\React\EventLoop\LoopInterface');
-        $client->setLoop($loop);
-        $this->assertSame($loop, $client->getLoop());
+        $loop = $this->getMockLoop();
+        $this->client->setLoop($loop);
+        $this->assertSame($loop, $this->client->getLoop());
     }
 
     /**
@@ -34,8 +78,360 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetLoop()
     {
-        $client = new Client;
-        $this->assertInstanceOf('\React\EventLoop\LoopInterface', $client->getLoop());
+        $this->assertInstanceOf('\React\EventLoop\LoopInterface', $this->client->getLoop());
+    }
+
+    /**
+     * Tests setLogger().
+     */
+    public function testSetLogger()
+    {
+        $logger = $this->getMockLogger();
+        $this->client->setLogger($logger);
+        $this->assertSame($logger, $this->client->getLogger());
+    }
+
+    /**
+     * Tests getLogger().
+     */
+    public function testGetLogger()
+    {
+        $logger = $this->client->getLogger();
+        $this->assertInstanceOf('\Psr\Log\LoggerInterface', $logger);
+        $this->assertSame($logger, $this->client->getLogger());
+    }
+
+    /**
+     * Tests getLogger() as part of code read from STDIN to verify that error
+     * logging is properly directed to STDERR by default.
+     */
+    public function testGetLoggerRunFromStdin()
+    {
+        $dir = __DIR__;
+        $port = $this->port;
+        $code = <<<EOF
+<?php
+require '$dir/../../../../../vendor/autoload.php';
+\$client = new \Phergie\Irc\Client\React\Client;
+\$logger = \$client->getLogger();
+\$logger->debug("test");
+EOF;
+        $script = tempnam(sys_get_temp_dir(), '');
+        file_put_contents($script, $code);
+        $null = strcasecmp(substr(PHP_OS, 0, 3), 'win') == 0 ? 'NUL' : '/dev/null';
+        $php = defined('PHP_BINARY') ? PHP_BINARY : PHP_BINDIR . '/php';
+
+        $command = $php . ' < ' . $script . ' 2>' . $null;
+        $output = shell_exec($command);
+        $this->assertNull($output);
+
+        $command = $php . ' < ' . $script . ' 2>&1';
+        $output = shell_exec($command);
+        $this->assertRegExp('/^[0-9]{4}(-[0-9]{2}){2} [0-9]{2}(:[0-9]{2}){2} DEBUG test$/', $output);
+    }
+
+    /**
+     * Tests addConnection() when a socket exception is thrown.
+     */
+    public function testAddConnectionWithException()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->getMockLogger();
+        $exception = new Exception('message', Exception::ERR_CONNECTION_ATTEMPT_FAILED);
+
+        $this->client->setLogger($logger);
+        Phake::when($this->client)
+            ->getSocket($this->isType('string'), $this->isType('array'))
+            ->thenThrow($exception);
+
+        $this->client->addConnection($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
+            Phake::verify($this->client)->emit('connect.error', array($exception->getMessage(), $connection, $logger)),
+            Phake::verify($this->client)->emit('connect.after.each', array($connection))
+        );
+    }
+
+    /**
+     * Tests addConnection() without a password.
+     */
+    public function testAddConnectionWithoutPassword()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($connection)->getPassword()->thenReturn(null);
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
+            Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
+            Phake::verify($writeStream)->ircNick('nickname'),
+            Phake::verify($this->client)->emit('connect.after.each', array($connection))
+        );
+
+        Phake::verify($writeStream, Phake::never())->ircPass($this->anything());
+    }
+
+    /**
+     * Tests addConnection() with a password.
+     */
+    public function testAddConnectionWithPassword()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
+            Phake::verify($writeStream)->ircPass('password'),
+            Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
+            Phake::verify($writeStream)->ircNick('nickname'),
+            Phake::verify($this->client)->emit('connect.after.each', array($connection))
+        );
+    }
+
+    /**
+     * Tests addConnection() with a previously added connection.
+     */
+    public function testAddConnectionWithPreviouslyAddedConnection()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $writeStream = $this->getMockWriteStream();
+        $loop = $this->getMockLoop();
+        $oldStream = $this->getMockStream();
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($connection)->getOption('stream')->thenReturn($oldStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
+            Phake::verify($loop)->removeStream($oldStream),
+            Phake::verify($connection)->setOption('stream',
+                $this->logicalAnd(
+                    $this->isInstanceOf('\React\Stream\Stream'),
+                    $this->logicalNot($this->identicalTo($oldStream))
+                )
+            ),
+            Phake::verify($writeStream)->ircPass('password'),
+            Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
+            Phake::verify($writeStream)->ircNick('nickname'),
+            Phake::verify($this->client)->emit('connect.after.each', array($connection))
+        );
+    }
+
+    /**
+     * Tests addConnection() with a connection configured to force usage of
+     * IPv4.
+     */
+    public function testAddConnectionWithForceIPv4Enabled()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
+
+        $this->client->addConnection($connection);
+
+        Phake::verify($this->client)->getStream(Phake::capture($socket));
+        $expected = array('socket' => array('bindto' => '0.0.0.0:0'));
+        $this->assertSame($expected, stream_context_get_options($socket));
+    }
+
+    /**
+     * Tests addConnection() with a concrete write stream, where most other
+     * tests have it mocked out.
+     */
+    public function testAddConnectionWithConcreteWriteStream()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->client->getLogger();
+        $logger->popHandler();
+        $stream = fopen('php://memory', 'w+');
+        $handler = new StreamHandler($stream, Logger::DEBUG);
+        $handler->setFormatter(new LineFormatter('%message%'));
+        $logger->pushHandler($handler);
+
+        $this->client->addConnection($connection);
+
+        $expected = "PASS :password\r\nUSER username hostname servername :realname\r\nNICK :nickname\r\n";
+        fseek($stream, 0);
+        $actual = stream_get_contents($stream);
+        $this->assertSame($expected, $actual);
+    }
+
+    /**
+     * Tests that the client emits an event when it receives a message from the
+     * server.
+     */
+    public function testReadCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->client->getLogger();
+        $readStream = $this->getMockReadStream();
+        $writeStream = $this->getMockWriteStream();
+        $message = array(
+            'command' => 'PRIVMSG',
+            'params' => array(
+                'receivers' => 'Wiz',
+                'text' => 'Hello',
+                'all' => 'Wiz :Hello',
+            ),
+            'message' => "PRIVMSG Wiz :Hello\r\n",
+        );
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
+        $callback($message);
+        Phake::verify($this->client)->emit('irc.received', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(4, $params);
+        $this->assertSame($message, $params[0]);
+        $this->assertInstanceOf('\Phergie\Irc\Client\React\WriteStream', $params[1]);
+        $this->assertSame($connection, $params[2]);
+        $this->assertSame($logger, $params[3]);
+    }
+
+    /**
+     * Tests that the client emits an event when a connection error occurs.
+     */
+    public function testErrorCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->client->getLogger();
+        $readStream = $this->getMockReadStream();
+        $writeStream = $this->getMockWriteStream();
+        $message = array(
+            'command' => 'PRIVMSG',
+            'params' => array(
+                'receivers' => 'Wiz',
+                'text' => 'Hello',
+                'all' => 'Wiz :Hello',
+            ),
+            'message' => "PRIVMSG Wiz :Hello\r\n",
+        );
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::verify($readStream)->on('error', Phake::capture($callback));
+        $callback($message);
+        Phake::verify($this->client)->emit('connect.error', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(3, $params);
+        $this->assertSame($message, $params[0]);
+        $this->assertSame($connection, $params[1]);
+        $this->assertSame($logger, $params[2]);
+    }
+
+    /**
+     * Tests run() with multiple connections.
+     */
+    public function testRunWithMultipleConnections()
+    {
+        $loop = $this->getMockLoop();
+        $connection1 = $this->getMockConnection();
+        $connection2 = $this->getMockConnection();
+        $connections = array($connection1, $connection2);
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->run($connections);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.all', array($connections)),
+            Phake::verify($this->client)->addConnection($connection1),
+            Phake::verify($this->client)->addConnection($connection2),
+            Phake::verify($this->client)->emit('connect.after.all', array($connections)),
+            Phake::verify($loop, Phake::times(1))->run()
+        );
+    }
+
+    /**
+     * Tests run() with a single connection.
+     */
+    public function testRunWithSingleConnection()
+    {
+        $loop = $this->getMockLoop();
+        $connection = $this->getMockConnection();
+        $connections = array($connection);
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->run($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.all', array($connections)),
+            Phake::verify($this->client)->addConnection($connection),
+            Phake::verify($this->client)->emit('connect.after.all', array($connections)),
+            Phake::verify($loop, Phake::times(1))->run()
+        );
+    }
+
+    /**
+     * Tests addTimer().
+     */
+    public function testAddTimer()
+    {
+        $interval = 5;
+        $callback = function() { };
+        $timer = $this->getMockTimer();
+        $loop = $this->getMockLoop();
+        Phake::when($loop)->addTimer($interval, $callback)->thenReturn($timer);
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->assertSame($timer, $this->client->addTimer($interval, $callback));
+    }
+
+    /**
+     * Tests addPeriodicTimer().
+     */
+    public function testAddPeriodicTimer()
+    {
+        $interval = 5;
+        $callback = function() { };
+        $timer = $this->getMockTimer();
+        $loop = $this->getMockLoop();
+        Phake::when($loop)->addPeriodicTimer($interval, $callback)->thenReturn($timer);
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->assertSame($timer, $this->client->addPeriodicTimer($interval, $callback));
+    }
+
+    /**
+     * Tests cancelTimer().
+     */
+    public function testCancelTimer()
+    {
+        $timer = $this->getMockTimer();
+        $loop = $this->getMockLoop();
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->cancelTimer($timer);
+
+        Phake::verify($loop)->cancelTimer($timer);
+    }
+
+    /**
+     * Tests isTimerActive().
+     */
+    public function testIsTimerActive()
+    {
+        $timer = $this->getMockTimer();
+        $loop = $this->getMockLoop();
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->isTimerActive($timer);
+
+        Phake::verify($loop)->isTimerActive($timer);
     }
 
     /**
@@ -45,209 +441,17 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockLogger()
     {
-        return $this->getMock('\Psr\Log\LoggerInterface', array(), array(), '', false);
+        return Phake::mock('\Psr\Log\LoggerInterface');
     }
 
     /**
-     * Tests setLogger().
-     */
-    public function testSetLogger()
-    {
-        $client = new Client;
-        $logger = $this->getMockLogger();
-        $client->setLogger($logger);
-        $this->assertSame($logger, $client->getLogger());
-    }
-
-    /**
-     * Tests getLogger().
-     */
-    public function testGetLogger()
-    {
-        $client = new Client;
-        $logger = $client->getLogger();
-        $this->assertInstanceOf('\Psr\Log\LoggerInterface', $logger);
-        $this->assertSame($logger, $client->getLogger());
-    }
-
-    /**
-     * Returns a mock connection for testing getRemote().
+     * Returns a mock timer.
      *
-     * @param string $serverHostname
-     * @param int $serverPort
+     * @return \React\EventLoop\Timer\TimerInterface
      */
-    protected function getMockConnectionForGetRemote($serverHostname, $serverPort)
+    protected function getMockTimer()
     {
-        $connection = $this->getMockConnection();
-
-        $connection
-            ->expects($this->any())
-            ->method('getServerHostname')
-            ->will($this->returnValue($serverHostname));
-
-        $connection
-            ->expects($this->any())
-            ->method('getServerPort')
-            ->will($this->returnValue($serverPort));
-
-        return $connection;
-    }
-
-    /**
-     * Returns a reflector for a non-public method of the class under test,
-     * used to invoke that method directly to test it.
-     *
-     * @param string $method Name of the non-public method
-     * @return \ReflectionMethod
-     */
-    protected function getMethod($method)
-    {
-        $method = new \ReflectionMethod('\Phergie\Irc\Client\React\Client', $method);
-        $method->setAccessible(true);
-        return $method;
-    }
-
-    /**
-     * Tests getRemote().
-     */
-    public function testGetRemote()
-    {
-        $client = new Client;
-        $method = $this->getMethod('getRemote');
-
-        $connection = $this->getMockConnectionForGetRemote('irc.freenode.net', 6667);
-        $this->assertSame('tcp://irc.freenode.net:6667', $method->invoke($client, $connection));
-
-        $connection = $this->getMockConnectionForGetRemote('irc.rizon.net', 2323);
-        $connection
-            ->expects($this->any())
-            ->method('getOption')
-            ->with('transport')
-            ->will($this->returnValue('ssl'));
-        $this->assertSame('ssl://irc.rizon.net:2323', $method->invoke($client, $connection));
-    }
-
-    /**
-     * Tests getContext().
-     */
-    public function testGetContext()
-    {
-        $client = new Client;
-        $method = $this->getMethod('getContext');
-
-        $connection = $this->getMockConnection();
-        $this->assertSame(array('socket' => array()), $method->invoke($client, $connection));
-
-        $connection = $this->getMockConnection();
-        $connection
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('force-ipv4')
-            ->will($this->returnValue(true));
-        $this->assertSame(array('socket' => array('bindto' => '0.0.0.0:0')), $method->invoke($client, $connection));
-    }
-
-    /**
-     * Tests getStream().
-     */
-    public function testGetStream()
-    {
-        $client = new Client;
-        $method = $this->getMethod('getStream');
-        $socket = fopen('php://memory', 'r+');
-        $loop = $this->getMock('\React\EventLoop\LoopInterface');
-        $client->setLoop($loop);
-        $this->assertInstanceOf('\React\Stream\Stream', $method->invoke($client, $socket));
-        fclose($socket);
-    }
-
-    /**
-     * Tests getReadStream().
-     */
-    public function testGetReadStream()
-    {
-        $logger = $this->getMockLogger();
-        $logger
-            ->expects($this->at(0))
-            ->method('debug')
-            ->with('data-msg');
-        $logger
-            ->expects($this->at(1))
-            ->method('debug')
-            ->with('error-msg');
-
-        $client = new Client;
-        $client->setLogger($logger);
-
-        $method = $this->getMethod('getReadStream');
-        $read = $method->invoke($client);
-        $this->assertInstanceOf('\Phergie\Irc\Client\React\ReadStream', $read);
-        $read->emit('data', array('data-msg'));
-        $read->emit('error', array('error-msg'));
-    }
-
-    /**
-     * Tests getWriteStream().
-     */
-    public function testGetWriteStream()
-    {
-        $logger = $this->getMockLogger();
-        $logger
-            ->expects($this->at(0))
-            ->method('debug')
-            ->with('data-msg');
-        $logger
-            ->expects($this->at(1))
-            ->method('debug')
-            ->with('error-msg');
-
-        $client = new Client;
-        $client->setLogger($logger);
-
-        $method = $this->getMethod('getWriteStream');
-        $read = $method->invoke($client);
-        $this->assertInstanceOf('\Phergie\Irc\Client\React\WriteStream', $read);
-        $read->emit('data', array('data-msg'));
-        $read->emit('error', array('error-msg'));
-    }
-
-    /**
-     * Tests getSocket() with invalid socket metadata.
-     */
-    public function testGetSocketWithInvalidSocketMetadata()
-    {
-        $client = new Client;
-        $method = $this->getMethod('getSocket');
-
-        try {
-            $method->invoke($client, 'tcp://0.0.0.0:0', array());
-            $this->fail('Expected exception not thrown');
-        } catch (Exception $e) {
-            $this->assertEquals(Exception::ERR_CONNECTION_ATTEMPT_FAILED, $e->getCode());
-            $this->assertStringStartsWith(
-                'Unable to connect to remote tcp://0.0.0.0:0: socket error ',
-                $e->getMessage()
-            );
-        }
-    }
-
-    /**
-     * Tests getSocket() with valid socket metadata.
-     */
-    public function testGetSocketWithValidSocketMetadata()
-    {
-        $server = stream_socket_server('tcp://localhost:0');
-        $name = stream_socket_get_name($server, false);
-        $port = (int) substr(strrchr($name, ':'), 1);
-
-        $client = new Client;
-        $method = $this->getMethod('getSocket');
-
-        $socket = $method->invoke($client, 'tcp://localhost:' . $port, array());
-        $this->assertInternalType('resource', $socket);
-
-        // Make sure the stream is non-blocking
-        $this->assertFalse(fgets($socket));
+        return Phake::mock('\React\EventLoop\Timer\TimerInterface');
     }
 
     /**
@@ -257,7 +461,51 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockConnection()
     {
-        return $this->getMock('\Phergie\Irc\ConnectionInterface', array(), array(), '', false);
+        return Phake::mock('\Phergie\Irc\ConnectionInterface');
+    }
+
+    /**
+     * Returns a mock write stream.
+     *
+     * @return \Phergie\Irc\Client\React\WriteStream
+     */
+    protected function getMockWriteStream()
+    {
+        $write = Phake::mock('\Phergie\Irc\Client\React\WriteStream');
+        Phake::when($write)
+            ->pipe($this->isInstanceOf('\React\Stream\WritableStreamInterface'))
+            ->thenGetReturnByLambda(function($stream) { return $stream; });
+        return $write;
+    }
+
+    /**
+     * Returns a mock stream.
+     *
+     * @return \React\Stream\Stream
+     */
+    protected function getMockStream()
+    {
+        return Phake::mock('\React\Stream\Stream');
+    }
+
+    /**
+     * Returns a mock read stream.
+     *
+     * @return \Phergie\Irc\Client\React\ReadStream
+     */
+    protected function getMockReadStream()
+    {
+        return Phake::mock('\Phergie\Irc\Client\React\ReadStream');
+    }
+
+    /**
+     * Returns a mock loop.
+     *
+     * @return \React\EventLoop\LoopInterface
+     */
+    protected function getMockLoop()
+    {
+        return Phake::mock('\React\EventLoop\LoopInterface');
     }
 
     /**
@@ -268,508 +516,14 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     protected function getMockConnectionForAddConnection()
     {
         $connection = $this->getMockConnection();
-        foreach (array('username', 'hostname', 'servername', 'realname', 'nickname') as $property) {
-            $connection
-                ->expects($this->once())
-                ->method('get' . ucfirst($property))
-                ->will($this->returnValue($property));
-        }
+        Phake::when($connection)->getPassword()->thenReturn('password');
+        Phake::when($connection)->getUsername()->thenReturn('username');
+        Phake::when($connection)->getHostname()->thenReturn('hostname');
+        Phake::when($connection)->getServername()->thenReturn('servername');
+        Phake::when($connection)->getRealname()->thenReturn('realname');
+        Phake::when($connection)->getNickname()->thenReturn('nickname');
+        Phake::when($connection)->getServerHostname()->thenReturn('0.0.0.0');
+        Phake::when($connection)->getServerPort()->thenReturn($this->port);
         return $connection;
-    }
-
-    /**
-     * Returns a mock write stream.
-     *
-     * @return \Phergie\Irc\Client\React\WriteStream
-     */
-    protected function getMockWriteStream()
-    {
-        return $this->getMock('\Phergie\Irc\Client\React\WriteStream', array(), array(), '', false);
-    }
-
-    /**
-     * Returns a mock write stream for testing addConnection().
-     *
-     * @return \Phergie\Irc\Client\React\WriteStream
-     */
-    protected function getMockWriteStreamForAddConnection()
-    {
-        $writeStream = $this->getMockWriteStream();
-        $writeStream
-            ->expects($this->once())
-            ->method('ircUser')
-            ->with('username', 'hostname', 'servername', 'realname');
-        $writeStream
-            ->expects($this->once())
-            ->method('ircNick')
-            ->with('nickname');
-        return $writeStream;
-    }
-
-    /**
-     * Returns a mock stream.
-     *
-     * @return \React\Stream\Stream
-     */
-    protected function getMockStream()
-    {
-        return $this->getMock('\React\Stream\Stream', array(), array(), '', false);
-    }
-
-    /**
-     * Returns a mock client for testing addConnection().
-     *
-     * @param \Phergie\Irc\ConnectionInterface $connection
-     * @param \Phergie\Irc\Client\React\WriteStream $writeStream
-     * @param \React\EventLoop\LoopInterface $loop
-     * @param array $clientMethods
-     * @return \Phergie\Irc\Client\React\Client
-     */
-    protected function getMockClientForAddConnection($connection, $writeStream, $loop, array $clientMethods = array())
-    {
-        $remote = 'tcp://irc.rizon.net:6667';
-        $context = array('socket' => array());
-        $socket = fopen('php://memory', 'r+');
-        $readCallback = function() { };
-        $writeCallback = function() { };
-        $errorCallback = function() { };
-
-        $readStream = $this->getMock('\Phergie\Irc\Client\React\ReadStream', array(), array(), '', false);
-        $readStream
-            ->expects($this->at(0))
-            ->method('on')
-            ->with('irc.received', $readCallback);
-        $readStream
-            ->expects($this->at(1))
-            ->method('on')
-            ->with('error', $errorCallback);
-
-        $stream = $this->getMockStream();
-        $stream
-            ->expects($this->once())
-            ->method('pipe')
-            ->with($readStream)
-            ->will($this->returnValue($readStream));
-
-        $writeStream
-            ->expects($this->at(0))
-            ->method('pipe')
-            ->with($stream)
-            ->will($this->returnValue($stream));
-        $writeStream
-            ->expects($this->at(1))
-            ->method('on')
-            ->with('data', $writeCallback);
-        $writeStream
-            ->expects($this->at(2))
-            ->method('on')
-            ->with('error', $errorCallback);
-
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array_merge($clientMethods, array('getRemote', 'getContext', 'getSocket', 'getStream', 'getWriteStream', 'getReadStream', 'getReadCallback', 'getLoop', 'emit')));
-        $client
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('connect.before.each', array($connection));
-        $client
-            ->expects($this->any())
-            ->method('getLoop')
-            ->will($this->returnValue($loop));
-        $client
-            ->expects($this->once())
-            ->method('getRemote')
-            ->with($connection)
-            ->will($this->returnValue($remote));
-        $client
-            ->expects($this->once())
-            ->method('getContext')
-            ->with($connection)
-            ->will($this->returnValue($context));
-        $client
-            ->expects($this->once())
-            ->method('getSocket')
-            ->with($remote, $context)
-            ->will($this->returnValue($socket));
-        $client
-            ->expects($this->once())
-            ->method('getStream')
-            ->with($socket)
-            ->will($this->returnValue($stream));
-        $client
-            ->expects($this->once())
-            ->method('getWriteStream')
-            ->will($this->returnValue($writeStream));
-        $client
-            ->expects($this->once())
-            ->method('getReadStream')
-            ->will($this->returnValue($readStream));
-        $client
-            ->expects($this->once())
-            ->method('getReadCallback')
-            ->with($writeStream, $connection)
-            ->will($this->returnValue($readCallback));
-        $client
-            ->expects($this->any())
-            ->method('getWriteCallback')
-            ->with($connection)
-            ->will($this->returnValue($writeCallback));
-        $client
-            ->expects($this->any())
-            ->method('getErrorCallback')
-            ->with($connection)
-            ->will($this->returnValue($errorCallback));
-
-        return $client;
-    }
-
-    /**
-     * Returns a mock loop.
-     *
-     * @return \React\EventLoop\LoopInterface
-     */
-    protected function getMockLoop()
-    {
-        return $this->getMock('\React\EventLoop\LoopInterface', array(), array(), '', false);
-    }
-
-    /**
-     * Tests addConnection() when getSocket() throws an exception.
-     */
-    public function testAddConnnectionWithException()
-    {
-        $connection = $this->getMock('\Phergie\Irc\Connection', array(), array(), '', false);
-        $writeStream = $this->getMock('\Phergie\Irc\Client\React\WriteStream', array(), array(), '', false);
-        $logger = $this->getMockLogger();
-        $remote = 'REMOTE';
-        $context = array();
-        $exception = new Exception(
-            'Unable to connect to remote ' . $remote . ': socket error errno errstr',
-            Exception::ERR_CONNECTION_ATTEMPT_FAILED
-        );
-
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('getRemote', 'getContext', 'getSocket', 'getLogger', 'emit'));
-
-        $client
-            ->expects($this->once())
-            ->method('getRemote')
-            ->with($connection)
-            ->will($this->returnValue($remote));
-        $client
-            ->expects($this->once())
-            ->method('getContext')
-            ->with($connection)
-            ->will($this->returnValue($context));
-        $client
-            ->expects($this->once())
-            ->method('getSocket')
-            ->with($remote, $context)
-            ->will($this->throwException($exception));
-        $client
-            ->expects($this->once())
-            ->method('getLogger')
-            ->will($this->returnValue($logger));
-        $client
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('connect.before.each', array($connection));
-        $client
-            ->expects($this->at(5))
-            ->method('emit')
-            ->with('connect.error', array($exception->getMessage(), $connection, $logger));
-        $client
-            ->expects($this->at(6))
-            ->method('emit')
-            ->with('connect.after.each', array($connection));
-
-        $client->addConnection($connection);
-    }
-
-    /**
-     * Tests addConnection() without a password.
-     */
-    public function testAddConnectionWithoutPassword()
-    {
-        $connection = $this->getMockConnectionForAddConnection();
-        $writeStream = $this->getMockWriteStreamForAddConnection();
-        $loop = $this->getMockLoop();
-        $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
-        $client
-            ->expects($this->at(8))
-            ->method('emit')
-            ->with('connect.after.each', array($connection));
-        $client->addConnection($connection);
-    }
-
-    /**
-     * Tests addConnection() with a password.
-     */
-    public function testAddConnectionWithPassword()
-    {
-        $connection = $this->getMockConnectionForAddConnection();
-        $connection
-            ->expects($this->once())
-            ->method('getPassword')
-            ->will($this->returnValue('password'));
-
-        $writeStream = $this->getMockWriteStreamForAddConnection();
-        $writeStream
-            ->expects($this->once())
-            ->method('ircPass')
-            ->with('password');
-
-        $loop = $this->getMockLoop();
-        $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
-        $client
-            ->expects($this->at(8))
-            ->method('emit')
-            ->with('connect.after.each', array($connection));
-        $client->addConnection($connection);
-    }
-
-    /**
-     * Tests addConnection() with a previously added connection.
-     */
-    public function testAddConnectionWithPreviouslyAddedConnection()
-    {
-        $stream = $this->getMockStream();
-        $loop = $this->getMockLoop();
-        $writeStream = $this->getMockWriteStreamForAddConnection();
-
-        $connection = $this->getMockConnectionForAddConnection();
-        $connection
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('stream')
-            ->will($this->returnValue($stream));
-        $connection
-            ->expects($this->once())
-            ->method('setOption')
-            ->with('stream', $this->logicalAnd($this->isInstanceOf('\React\Stream\Stream'), $this->logicalNot($this->identicalTo($stream))));
-        $loop
-            ->expects($this->once())
-            ->method('removeStream')
-            ->with($stream);
-
-        $client = $this->getMockClientForAddConnection($connection, $writeStream, $loop);
-        $client
-            ->expects($this->at(9))
-            ->method('emit')
-            ->with('connect.after.each', array($connection));
-        $client->addConnection($connection);
-    }
-
-    /**
-     * Tests run() with multiple connections.
-     */
-    public function testRunWithMultipleConnections()
-    {
-        $loop = $this->getMockLoop('\React\EventLoop\LoopInterface');
-        $loop
-            ->expects($this->once())
-            ->method('run');
-
-        $connection1 = $this->getMockConnection();
-        $connection2 = $this->getMockConnection();
-        $connections = array($connection1, $connection2);
-
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('addConnection', 'getLoop', 'emit'));
-        $client
-            ->expects($this->any())
-            ->method('getLoop')
-            ->will($this->returnValue($loop));
-        $client
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('connect.before.all', array($connections));
-        $client
-            ->expects($this->at(1))
-            ->method('addConnection')
-            ->with($connection1);
-        $client
-            ->expects($this->at(2))
-            ->method('addConnection')
-            ->with($connection2);
-        $client
-            ->expects($this->at(3))
-            ->method('emit')
-            ->with('connect.after.all', array($connections));
-
-        $client->run($connections);
-    }
-
-    /**
-     * Tests run() with a single connection.
-     */
-    public function testRunWithSingleConnection()
-    {
-        $loop = $this->getMockLoop('\React\EventLoop\LoopInterface');
-        $loop
-            ->expects($this->once())
-            ->method('run');
-
-        $connection = $this->getMockConnection();
-        $connections = array($connection);
-
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('addConnection', 'getLoop', 'emit'));
-        $client
-            ->expects($this->any())
-            ->method('getLoop')
-            ->will($this->returnValue($loop));
-        $client
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('connect.before.all', array($connections));
-        $client
-            ->expects($this->at(1))
-            ->method('addConnection')
-            ->with($connection);
-        $client
-            ->expects($this->at(2))
-            ->method('emit')
-            ->with('connect.after.all', array($connections));
-
-        $client->run($connection);
-    }
-
-    /**
-     * Tests getReadCallback().
-     */
-    public function testGetReadCallback()
-    {
-        $logger = $this->getMockLogger();
-        $write = $this->getMockWriteStream();
-        $connection = $this->getMockConnection();
-        $method = $this->getMethod('getReadCallback');
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('emit'));
-        $client->setLogger($logger);
-        $client
-            ->expects($this->once())
-            ->method('emit')
-            ->with('irc.received', array('msg', $write, $connection, $logger));
-
-        $callback = $method->invoke($client, $write, $connection);
-        $callback('msg');
-    }
-
-    /**
-     * Tests getWriteCallback().
-     */
-    public function testGetWriteCallback()
-    {
-        $logger = $this->getMockLogger();
-        $write = $this->getMockWriteStream();
-        $connection = $this->getMockConnection();
-        $method = $this->getMethod('getWriteCallback');
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('emit'));
-        $client->setLogger($logger);
-        $client
-            ->expects($this->once())
-            ->method('emit')
-            ->with('irc.sent', array('msg', $connection, $logger));
-
-        $callback = $method->invoke($client, $connection);
-        $callback('msg');
-    }
-
-    /**
-     * Tests getErrorCallback().
-     */
-    public function testGetErrorCallback()
-    {
-        $logger = $this->getMockLogger();
-        $write = $this->getMockWriteStream();
-        $connection = $this->getMockConnection();
-        $method = $this->getMethod('getErrorCallback');
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('emit'));
-        $client->setLogger($logger);
-        $client
-            ->expects($this->once())
-            ->method('emit')
-            ->with('connect.error', array('msg', $connection, $logger));
-
-        $callback = $method->invoke($client, $connection);
-        $callback('msg');
-    }
-
-    /**
-     * Returns a client stubbed for testing timer-related methods.
-     *
-     * @param \React\EventLoop\LoopInterface $loop
-     * @return \Phergie\Irc\Client\React\Client
-     */
-    protected function getClientForTimerTest(\React\EventLoop\LoopInterface $loop)
-    {
-        $client = $this->getMock('\Phergie\Irc\Client\React\Client', array('getLoop'));
-        $client
-            ->expects($this->any())
-            ->method('getLoop')
-            ->will($this->returnValue($loop));
-        return $client;
-    }
-
-    /**
-     * Data provider for testAddTimer().
-     *
-     * @return array
-     */
-    public function dataProviderTestAddTimer()
-    {
-        return array(
-            array('addTimer'),
-            array('addPeriodicTimer'),
-        );
-    }
-
-    /**
-     * Tests adding timers.
-     *
-     * @param string $method Method being tested
-     * @dataProvider dataProviderTestAddTimer
-     */
-    public function testAddTimers($method)
-    {
-        $interval = 5;
-        $callback = function() { };
-        $timer = $this->getMock('\React\Event\Timer\TimerInterface');
-
-        $loop = $this->getMockLoop();
-        $loop->expects($this->once())
-            ->method($method)
-            ->with($interval, $callback)
-            ->will($this->returnValue($timer));
-
-        $client = $this->getClientForTimerTest($loop);
-        $client->$method($interval, $callback);
-    }
-
-    /**
-     * Tests cancelTimer().
-     */
-    public function testCancelTimer()
-    {
-        $timer = $this->getMock('\React\EventLoop\Timer\TimerInterface');
-
-        $loop = $this->getMockLoop();
-        $loop->expects($this->once())
-            ->method('cancelTimer')
-            ->with($timer);
-
-        $client = $this->getClientForTimerTest($loop);
-        $client->cancelTimer($timer);
-    }
-
-    /**
-     * Tests isTimerActive().
-     */
-    public function testIsTimerActive()
-    {
-        $timer = $this->getMock('\React\EventLoop\Timer\TimerInterface');
-
-        $loop = $this->getMockLoop();
-        $loop->expects($this->once())
-            ->method('isTimerActive')
-            ->with($timer);
-
-        $client = $this->getClientForTimerTest($loop);
-        $client->isTimerActive($timer);
     }
 }

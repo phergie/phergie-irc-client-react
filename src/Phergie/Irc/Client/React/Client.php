@@ -191,8 +191,11 @@ class Client extends EventEmitter implements ClientInterface
     {
         if (!$this->logger) {
             if (!defined('STDERR')) {
+                // See testGetLoggerRunFromStdin
+                // @codeCoverageIgnoreStart
                 define('STDERR', fopen('php://stderr', 'w'));
             }
+            // @codeCoverageIgnoreEnd
             $handler = new StreamHandler(STDERR, Logger::DEBUG);
             $handler->setFormatter(new LineFormatter('%datetime% %level_name% %message%'));
             $this->logger = new Logger(get_class($this));
@@ -234,7 +237,7 @@ class Client extends EventEmitter implements ClientInterface
      * Returns a callback for proxying events from the write stream to IRC
      * listeners of the client.
      *
-     * @paran \Phergie\Irc\ConnectionInterface $connection Connection on which
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection on which
      *        the event occurred
      * @return callable
      */
@@ -251,7 +254,7 @@ class Client extends EventEmitter implements ClientInterface
      * Returns a callback for proxying connection error events to listeners of
      * the client.
      *
-     * @paran \Phergie\Irc\ConnectionInterface $connection Connection on which
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection on which
      *        the error occurred
      * @return callable
      */
@@ -262,6 +265,53 @@ class Client extends EventEmitter implements ClientInterface
         return function($message) use ($client, $connection, $logger) {
             $client->emit('connect.error', array($message, $connection, $logger));
         };
+    }
+
+    /**
+     * Configure streams to handle messages received from and sent to the
+     * server.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection Metadata for the
+     *        connection over which messages are being exchanged
+     * @param \React\Stream\Stream $stream Stream representing the connection
+     *        to the server
+     * @param \Phergie\Irc\Client\React\WriteStream $write Stream used to
+     *        send events to the server
+     */
+    protected function configureStreams(ConnectionInterface $connection, Stream $stream, WriteStream $write)
+    {
+        $read = $this->getReadStream();
+        $write->pipe($stream)->pipe($read);
+        $read->on('irc.received', $this->getReadCallback($write, $connection));
+        $write->on('data', $this->getWriteCallback($connection));
+        $error = $this->getErrorCallback($connection);
+        $read->on('error', $error);
+        $write->on('error', $error);
+    }
+
+    /**
+     * Identifies the user to a server.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection on which
+     *        to identify the user
+     * @param \Phergie\Irc\Client\React\WriteStream $writeStream Stream to
+     *        receive commands identifying the user
+     */
+    protected function identifyUser(ConnectionInterface $connection, WriteStream $writeStream)
+    {
+        $password = $connection->getPassword();
+        if ($password) {
+            $writeStream->ircPass($password);
+        }
+
+        $writeStream->ircUser(
+            $connection->getUsername(),
+            $connection->getHostname(),
+            $connection->getServername(),
+            $connection->getRealname()
+        );
+
+        $writeStream->ircNick($connection->getNickname());
     }
 
     /**
@@ -293,30 +343,9 @@ class Client extends EventEmitter implements ClientInterface
             $stream = $this->getStream($socket);
             $connection->setOption('stream', $stream);
 
-            // Configure streams to handle messages received from and sent to the server
-            $read = $this->getReadStream();
             $write = $this->getWriteStream();
-            $write->pipe($stream)->pipe($read);
-            $read->on('irc.received', $this->getReadCallback($write, $connection));
-            $write->on('data', $this->getWriteCallback($connection));
-            $error = $this->getErrorCallback($connection);
-            $read->on('error', $error);
-            $write->on('error', $error);
-
-            // Establish the user's identity to the server
-            $password = $connection->getPassword();
-            if ($password) {
-                $write->ircPass($password);
-            }
-
-            $write->ircUser(
-                $connection->getUsername(),
-                $connection->getHostname(),
-                $connection->getServername(),
-                $connection->getRealname()
-            );
-
-            $write->ircNick($connection->getNickname());
+            $this->configureStreams($connection, $stream, $write);
+            $this->identifyUser($connection, $write);
         } catch (Exception $e) {
             $this->emit(
                 'connect.error',
