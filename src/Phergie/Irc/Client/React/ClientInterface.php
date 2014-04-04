@@ -10,6 +10,7 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Evenement\EventEmitterInterface;
 use Phergie\Irc\ConnectionInterface;
 use Psr\Log\LoggerInterface;
 
@@ -19,7 +20,7 @@ use Psr\Log\LoggerInterface;
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-interface ClientInterface
+interface ClientInterface extends EventEmitterInterface
 {
     /**
      * Initializes an IRC connection.
