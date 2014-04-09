@@ -151,7 +151,7 @@ class Client extends EventEmitter implements ClientInterface
     {
         $logger = $this->getLogger();
         $callback = function($msg) use ($logger) {
-            $logger->debug($msg);
+            $logger->debug(trim($msg));
         };
         $emitter->on('data', $callback);
         $emitter->on('error', $callback);

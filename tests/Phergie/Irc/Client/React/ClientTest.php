@@ -274,7 +274,7 @@ EOF;
         $logger->popHandler();
         $stream = fopen('php://memory', 'w+');
         $handler = new StreamHandler($stream, Logger::DEBUG);
-        $handler->setFormatter(new LineFormatter('%message%'));
+        $handler->setFormatter(new LineFormatter("%message%\r\n"));
         $logger->pushHandler($handler);
 
         $this->client->addConnection($connection);
