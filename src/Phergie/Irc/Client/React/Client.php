@@ -389,6 +389,10 @@ class Client extends EventEmitter implements ClientInterface
             $connections = array($connections);
         }
 
+        $this->on('connect.error', function($message, $connection, $logger) {
+            $logger->error($message);
+        });
+
         $this->emit('connect.before.all', array($connections));
         foreach ($connections as $connection) {
             $this->addConnection($connection);

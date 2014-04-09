@@ -158,13 +158,16 @@ EOF;
             ->getSocket($this->isType('string'), $this->isType('array'))
             ->thenThrow($exception);
 
-        $this->client->addConnection($connection);
+        $this->client->setLoop($this->getMockLoop());
+        $this->client->run($connection);
 
         Phake::inOrder(
             Phake::verify($this->client)->emit('connect.before.each', array($connection)),
             Phake::verify($this->client)->emit('connect.error', array($exception->getMessage(), $connection, $logger)),
             Phake::verify($this->client)->emit('connect.after.each', array($connection))
         );
+
+        Phake::verify($logger)->error($exception->getMessage());
     }
 
     /**
@@ -362,6 +365,7 @@ EOF;
         $connections = array($connection1, $connection2);
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->run($connections);
 
         Phake::inOrder(
@@ -383,6 +387,7 @@ EOF;
         $connections = array($connection);
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->run($connection);
 
         Phake::inOrder(
