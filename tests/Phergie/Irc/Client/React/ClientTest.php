@@ -142,6 +142,8 @@ EOF;
         $command = $php . ' < ' . $script . ' 2>&1';
         $output = shell_exec($command);
         $this->assertRegExp('/^[0-9]{4}(-[0-9]{2}){2} [0-9]{2}(:[0-9]{2}){2} DEBUG test$/', $output);
+
+        unlink($script);
     }
 
     /**
