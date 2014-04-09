@@ -197,7 +197,7 @@ class Client extends EventEmitter implements ClientInterface
             }
             // @codeCoverageIgnoreEnd
             $handler = new StreamHandler(STDERR, Logger::DEBUG);
-            $handler->setFormatter(new LineFormatter('%datetime% %level_name% %message%'));
+            $handler->setFormatter(new LineFormatter("%datetime% %level_name% %message%\n"));
             $this->logger = new Logger(get_class($this));
             $this->logger->pushHandler($handler);
         }
