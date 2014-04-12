@@ -312,6 +312,32 @@ EOF;
     }
 
     /**
+     * Tests that the client emits an event when it sends a message to the
+     * server.
+     */
+    public function testWriteCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->client->getLogger();
+        $readStream = $this->getMockReadStream();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+
+        $this->client->addConnection($connection);
+
+        Phake::verify($writeStream)->on('data', Phake::capture($callback));
+        $callback($this->message);
+        Phake::verify($this->client)->emit('irc.sent', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(4, $params);
+        $this->assertSame($this->message, $params[0]);
+        $this->assertInstanceOf('\Phergie\Irc\Client\React\WriteStream', $params[1]);
+        $this->assertSame($connection, $params[2]);
+        $this->assertSame($logger, $params[3]);
+    }
+
+    /**
      * Tests that the client emits an event when a connection error occurs.
      */
     public function testErrorCallback()

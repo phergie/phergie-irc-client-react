@@ -237,16 +237,18 @@ class Client extends EventEmitter implements ClientInterface
      * Returns a callback for proxying events from the write stream to IRC
      * listeners of the client.
      *
+     * @param \Phergie\Irc\Client\React\WriteStream $write Write stream
+     *        corresponding to the read stream on which the event occurred
      * @param \Phergie\Irc\ConnectionInterface $connection Connection on which
      *        the event occurred
      * @return callable
      */
-    protected function getWriteCallback(ConnectionInterface $connection)
+    protected function getWriteCallback(WriteStream $write, ConnectionInterface $connection)
     {
         $client = $this;
         $logger = $this->getLogger();
-        return function($message) use ($client, $connection, $logger) {
-            $client->emit('irc.sent', array($message, $connection, $logger));
+        return function($message) use ($client, $write, $connection, $logger) {
+            $client->emit('irc.sent', array($message, $write, $connection, $logger));
         };
     }
 
@@ -299,7 +301,7 @@ class Client extends EventEmitter implements ClientInterface
         $read = $this->getReadStream();
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
-        $write->on('data', $this->getWriteCallback($connection));
+        $write->on('data', $this->getWriteCallback($write, $connection));
         $write->on('end', $this->getEndCallback($connection));
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
