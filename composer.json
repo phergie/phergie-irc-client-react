@@ -25,7 +25,7 @@
         "phake/phake": "2.0.0-alpha4"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Phergie\\Irc\\Client\\React\\": "src"
         }
     }
