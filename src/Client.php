@@ -146,12 +146,20 @@ class Client extends EventEmitter implements ClientInterface
      * Adds an event listener to log data emitted by a stream.
      *
      * @param \Evenement\EventEmitter $emitter
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection
+     *        corresponding to the stream
      */
-    protected function addLogging(EventEmitter $emitter)
+    protected function addLogging(EventEmitter $emitter, ConnectionInterface $connection)
     {
         $logger = $this->getLogger();
-        $callback = function($msg) use ($logger) {
-            $logger->debug(trim($msg));
+        $callback = function($msg) use ($logger, $connection) {
+            $mask = sprintf(
+                '%s!%s@%s',
+                $connection->getNickname(),
+                $connection->getUsername(),
+                $connection->getServerHostname()
+            );
+            $logger->debug($mask . ' ' . trim($msg));
         };
         $emitter->on('data', $callback);
         $emitter->on('error', $callback);
@@ -161,24 +169,28 @@ class Client extends EventEmitter implements ClientInterface
      * Returns a stream instance for parsing messages from the server and
      * emitting them as events.
      *
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection
+     *        corresponding to the read stream
      * @return \Phergie\Irc\Client\React\ReadStream
      */
-    protected function getReadStream()
+    protected function getReadStream(ConnectionInterface $connection)
     {
         $read = new ReadStream();
-        $this->addLogging($read);
+        $this->addLogging($read, $connection);
         return $read;
     }
 
     /**
      * Returns a stream instance for sending events to the server.
      *
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection
+     *        corresponding to the read stream
      * @return \Phergie\Irc\Client\React\WriteStream
      */
-    protected function getWriteStream()
+    protected function getWriteStream(ConnectionInterface $connection)
     {
         $write = new WriteStream();
-        $this->addLogging($write);
+        $this->addLogging($write, $connection);
         return $write;
     }
 
@@ -298,7 +310,7 @@ class Client extends EventEmitter implements ClientInterface
      */
     protected function configureStreams(ConnectionInterface $connection, Stream $stream, WriteStream $write)
     {
-        $read = $this->getReadStream();
+        $read = $this->getReadStream($connection);
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($write, $connection));
@@ -362,7 +374,7 @@ class Client extends EventEmitter implements ClientInterface
             $stream = $this->getStream($socket);
             $connection->setOption('stream', $stream);
 
-            $write = $this->getWriteStream();
+            $write = $this->getWriteStream($connection);
             $this->configureStreams($connection, $stream, $write);
             $this->identifyUser($connection, $write);
         } catch (Exception $e) {

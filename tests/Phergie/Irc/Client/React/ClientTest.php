@@ -180,8 +180,9 @@ EOF;
         $connection = $this->getMockConnectionForAddConnection();
         $writeStream = $this->getMockWriteStream();
         Phake::when($connection)->getPassword()->thenReturn(null);
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->addConnection($connection);
 
         Phake::inOrder(
@@ -201,8 +202,9 @@ EOF;
     {
         $connection = $this->getMockConnectionForAddConnection();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->addConnection($connection);
 
         Phake::inOrder(
@@ -224,9 +226,10 @@ EOF;
         $loop = $this->getMockLoop();
         $oldStream = $this->getMockStream();
         Phake::when($this->client)->getLoop()->thenReturn($loop);
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($connection)->getOption('stream')->thenReturn($oldStream);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->addConnection($connection);
 
         Phake::inOrder(
@@ -253,9 +256,10 @@ EOF;
     {
         $connection = $this->getMockConnectionForAddConnection();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
 
+        $this->client->setLogger($this->getMockLogger());
         $this->client->addConnection($connection);
 
         Phake::verify($this->client)->getStream(Phake::capture($socket));
@@ -279,7 +283,8 @@ EOF;
 
         $this->client->addConnection($connection);
 
-        $expected = "PASS :password\r\nUSER username hostname servername :realname\r\nNICK :nickname\r\n";
+        $mask = 'nickname!username@0.0.0.0';
+        $expected = "$mask PASS :password\r\n$mask USER username hostname servername :realname\r\n$mask NICK :nickname\r\n";
         fseek($stream, 0);
         $actual = stream_get_contents($stream);
         $this->assertSame($expected, $actual);
@@ -292,12 +297,13 @@ EOF;
     public function testReadCallback()
     {
         $connection = $this->getMockConnectionForAddConnection();
-        $logger = $this->client->getLogger();
+        $logger = $this->getMockLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
-        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
+        $this->client->setLogger($logger);
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
@@ -318,12 +324,13 @@ EOF;
     public function testWriteCallback()
     {
         $connection = $this->getMockConnectionForAddConnection();
-        $logger = $this->client->getLogger();
+        $logger = $this->getMockLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
-        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
+        $this->client->setLogger($logger);
         $this->client->addConnection($connection);
 
         Phake::verify($writeStream)->on('data', Phake::capture($callback));
@@ -343,12 +350,13 @@ EOF;
     public function testErrorCallback()
     {
         $connection = $this->getMockConnectionForAddConnection();
-        $logger = $this->client->getLogger();
+        $logger = $this->getMockLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
-        Phake::when($this->client)->getReadStream()->thenReturn($readStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
+        $this->client->setLogger($logger);
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('error', Phake::capture($callback));
@@ -367,10 +375,11 @@ EOF;
     public function testEndCallback()
     {
         $connection = $this->getMockConnectionForAddConnection();
-        $logger = $this->client->getLogger();
+        $logger = $this->getMockLogger();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream()->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
+        $this->client->setLogger($logger);
         $this->client->addConnection($connection);
 
         Phake::verify($writeStream)->on('end', Phake::capture($callback));
