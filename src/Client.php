@@ -46,6 +46,13 @@ class Client extends EventEmitter implements
     protected $logger;
 
     /**
+     * Interval in seconds between irc.tick events
+     *
+     * @var float
+     */
+    protected $tickInterval = 0.2;
+
+    /**
      * Sets the event loop dependency.
      *
      * @param \React\EventLoop\LoopInterface $loop
@@ -66,6 +73,26 @@ class Client extends EventEmitter implements
             $this->loop = \React\EventLoop\Factory::create();
         }
         return $this->loop;
+    }
+
+    /**
+     * Sets the interval in seconds between irc.tick events.
+     *
+     * @param float $tickInterval
+     */
+    public function setTickInterval($tickInterval)
+    {
+        $this->tickInterval = (float) $tickInterval;
+    }
+
+    /**
+     * Returns the interval in seconds between irc.tick events.
+     *
+     * @return float
+     */
+    public function getTickInterval()
+    {
+        return $this->tickInterval;
     }
 
     /**
@@ -301,6 +328,24 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Returns a callback executed periodically to allow events to be sent
+     * asynchronously versus in response to received or sent events.
+     *
+     * @param \Phergie\Irc\Client\React\WriteStream $write Stream used to
+     *        send events to the server
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection to
+     *        receive the event
+     */
+    protected function getTickCallback(WriteStream $write, ConnectionInterface $connection)
+    {
+        $client = $this;
+        $logger = $this->getLogger();
+        return function() use ($client, $write, $connection, $logger) {
+            $client->emit('irc.tick', array($write, $connection, $logger));
+        };
+    }
+
+    /**
      * Configure streams to handle messages received from and sent to the
      * server.
      *
@@ -321,6 +366,7 @@ class Client extends EventEmitter implements
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
         $write->on('error', $error);
+        $this->addPeriodicTimer($this->getTickInterval(), $this->getTickCallback($write, $connection));
     }
 
     /**

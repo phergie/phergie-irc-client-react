@@ -116,6 +116,24 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests setTickInterval().
+     */
+    public function testSetTickInterval()
+    {
+        $tickInterval = 0.5;
+        $this->client->setTickInterval($tickInterval);
+        $this->assertSame($tickInterval, $this->client->getTickInterval());
+    }
+
+    /**
+     * Tests getTickInterval().
+     */
+    public function testGetTickInterval()
+    {
+        $this->assertSame(0.2, $this->client->getTickInterval());
+    }
+
+    /**
      * Tests getLogger() as part of code read from STDIN to verify that error
      * logging is properly directed to STDERR by default.
      */
@@ -389,6 +407,31 @@ EOF;
         $this->assertCount(2, $params);
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
+    }
+
+    /**
+     * Tests that the client emits a periodic event per connection.
+     */
+    public function testTickCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->getMockLogger();
+        $loop = $this->getMockLoop();
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+
+        $this->client->setLoop($loop);
+        $this->client->setLogger($logger);
+        $this->client->addConnection($connection);
+
+        Phake::verify($loop)->addPeriodicTimer(0.2, Phake::capture($callback));
+        $callback();
+        Phake::verify($this->client)->emit('irc.tick', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(3, $params);
+        $this->assertSame($writeStream, $params[0]);
+        $this->assertSame($connection, $params[1]);
+        $this->assertSame($logger, $params[2]);
     }
 
     /**
