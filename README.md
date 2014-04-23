@@ -134,13 +134,17 @@ Emitted when an error is encountered on a connection.
 
 * `Exception $exception ` - exception describing the error that encountered
 * `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection on which the event occurred and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
-* `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+* `\Psr\Log\LoggerInterface $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
 
 #### Example
 
 ```php
 <?php
-$client->on('connect.error', function(\Exception $message, \Phergie\Irc\ConnectionInterface $connection, \Monolog\Logger $logger) use ($client) {
+$client->on('connect.error', function(
+    \Exception $message,
+    \Phergie\Irc\ConnectionInterface $connection,
+    \Psr\Log\LoggerInterface $logger
+) use ($client) {
     $logger->debug('Connection to ' . $connection->getServerHostname() . ' lost: ' . $e->getMessage());
 });
 ```
@@ -154,13 +158,13 @@ This can be useful for re-establishing a connection if it is unexpectedly termin
 #### Parameters
 
 * `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection that was terminated and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
-* `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+* `\Psr\Log\LoggerInterface $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
 
 #### Example
 
 ```php
 <?php
-$client->on('connect.end', function(\Phergie\Irc\ConnectionInterface $connection, \Monolog\Logger $logger) use ($client) {
+$client->on('connect.end', function(\Phergie\Irc\ConnectionInterface $connection, \Psr\Log\LoggerInterface $logger) use ($client) {
     $logger->debug('Connection to ' . $connection->getServerHostname() . ' lost, attempting to reconnect');
     $client->addConnection($connection);
 });
@@ -175,7 +179,7 @@ Emitted when an IRC event is received from the server.
 * `array $message` - associative array containing data for the event received from the server as obtained by `\Phergie\Irc\Parser` (see [its documentation](https://github.com/phergie/phergie-irc-parser#usage) for examples)
 * `\Phergie\Irc\Client\React\WriteStream $write` - stream that will send new events from the client to the server when its methods are called and implements the interface `\Phergie\Irc\GeneratorInterface` (see [its source code](https://github.com/phergie/phergie-irc-generator/blob/master/src/Phergie/Irc/GeneratorInterface.php) for a list of available methods)
 * `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection on which the event occurred and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
-* `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+* `\Psr\Log\LoggerInterface $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
 
 #### Example
 
@@ -185,7 +189,7 @@ $client->on('irc.received', function(
     array $message,
     \Phergie\Irc\Client\React\WriteStream $write,
     \Phergie\Irc\ConnectionInterface $connection,
-    \Monolog\Logger $logger
+    \Psr\Log\LoggerInterface $logger
 ) {
     // ...
 });
@@ -198,14 +202,46 @@ Emitted when an IRC event is sent by the client to the server.
 #### Parameters
 
 * `string $message` - message being sent by the client
+* `\Phergie\Irc\Client\React\WriteStream $write` - stream that will send new events from the client to the server when its methods are called and implements the interface `\Phergie\Irc\GeneratorInterface` (see [its source code](https://github.com/phergie/phergie-irc-generator/blob/master/src/Phergie/Irc/GeneratorInterface.php) for a list of available methods)
 * `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection on which the event occurred and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
-* `\Monolog\Logger $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+* `\Psr\Log\LoggerInterface $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
 
 #### Example
 
 ```php
 <?php
-$client->on('irc.sent', function($message, \Phergie\Irc\ConnectionInterface $connection,\Monolog\Logger $logger) {
+$client->on('irc.sent', function(
+    $message,
+    \Phergie\Irc\Client\React\WriteStream $write,
+    \Phergie\Irc\ConnectionInterface $connection,
+    \Psr\Log\LoggerInterface $logger
+) {
+    // ...
+});
+```
+
+### irc.tick
+
+Emitted periodically on each connection to allow events to be sent
+asynchronously versus in response to received or sent events. The interval
+between invocations is specified in seconds and set using the client's
+`setTickInterval()` method.
+
+#### Parameters
+
+* `\Phergie\Irc\Client\React\WriteStream $write` - stream that will send new events from the client to the server when its methods are called and implements the interface `\Phergie\Irc\GeneratorInterface` (see [its source code](https://github.com/phergie/phergie-irc-generator/blob/master/src/Phergie/Irc/GeneratorInterface.php) for a list of available methods)
+* `\Phergie\Irc\ConnectionInterface $connection` - container that stores metadata for the connection on which the event occurred and implements the interface `\Phergie\Irc\ConnectionInterface` (see [its source code](https://github.com/phergie/phergie-irc-connection/blob/master/src/Phergie/Irc/ConnectionInterface.php) for a list of available methods)
+* `\Psr\Log\LoggerInterface $logger` - logger for logging any relevant events from the listener which go to [stdout](http://en.wikipedia.org/wiki/Standard_streams#Standard_output_.28stdout.29) by default (see [the Monolog documentation](https://github.com/Seldaek/monolog#monolog---logging-for-php-53-) for more information)
+
+#### Example
+
+```php
+<?php
+$client->on('irc.tick', function(
+    \Phergie\Irc\Client\React\WriteStream $write,
+    \Phergie\Irc\ConnectionInterface $connection,
+    \Psr\Log\LoggerInterface $logger
+) {
     // ...
 });
 ```
