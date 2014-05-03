@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "7861d9bfec8ffc4020f854c423657817",
+    "hash": "6eaa8b0892ecd737224e4630d4968fc4",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -114,25 +114,28 @@
         },
         {
             "name": "phergie/phergie-irc-connection",
-            "version": "1.1.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
-                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18"
+                "reference": "927fe8421f9855fb8b40a0a8c7c74401d05aad64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/96521084b6931df13cbcd77a40f9fd7c4cd79d18",
-                "reference": "96521084b6931df13cbcd77a40f9fd7c4cd79d18",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/927fe8421f9855fb8b40a0a8c7c74401d05aad64",
+                "reference": "927fe8421f9855fb8b40a0a8c7c74401d05aad64",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.5"
+            },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Phergie": "src"
+                "psr-4": {
+                    "Phergie\\Irc\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -146,7 +149,7 @@
                 "irc",
                 "server"
             ],
-            "time": "2013-07-15 16:35:58"
+            "time": "2014-05-03 22:42:00"
         },
         {
             "name": "phergie/phergie-irc-generator",
@@ -655,16 +658,18 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "54ff6104fb211dbc5e9eaf82dbc8ee6dabdf6ed0"
+                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/54ff6104fb211dbc5e9eaf82dbc8ee6dabdf6ed0",
-                "reference": "54ff6104fb211dbc5e9eaf82dbc8ee6dabdf6ed0",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
+                "reference": "ae6cefd7cc84586a5ef27e04bae11ee940ec63dc",
                 "shasum": ""
             },
             "require": {
+                "ext-ctype": "*",
                 "ext-dom": "*",
+                "ext-json": "*",
                 "ext-pcre": "*",
                 "ext-reflection": "*",
                 "ext-spl": "*",
@@ -680,9 +685,6 @@
                 "pear-pear.php.net/pear": "1.9.4"
             },
             "suggest": {
-                "ext-json": "*",
-                "ext-simplexml": "*",
-                "ext-tokenizer": "*",
                 "phpunit/php-invoker": "~1.1"
             },
             "bin": [
@@ -721,7 +723,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-04-21 06:38:30"
+            "time": "2014-04-30 12:24:19"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -834,9 +836,9 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "phergie/phergie-irc-connection": 20
+    },
     "platform": {
         "php": ">=5.3.3"
     },
