@@ -153,11 +153,11 @@ EOF;
         $null = strcasecmp(substr(PHP_OS, 0, 3), 'win') == 0 ? 'NUL' : '/dev/null';
         $php = defined('PHP_BINARY') ? PHP_BINARY : PHP_BINDIR . '/php';
 
-        $command = $php . ' < ' . $script . ' 2>' . $null;
+        $command = $php . ' ' . $script . ' 2>' . $null;
         $output = shell_exec($command);
-        $this->assertNull($output);
+        $this->assertEmpty($output);
 
-        $command = $php . ' < ' . $script . ' 2>&1';
+        $command = $php . ' ' . $script . ' 2>&1';
         $output = shell_exec($command);
         $this->assertRegExp('/^[0-9]{4}(-[0-9]{2}){2} [0-9]{2}(:[0-9]{2}){2} DEBUG test \\[\\]$/', $output);
 
