@@ -280,9 +280,9 @@ EOF;
         $this->client->setLogger($this->getMockLogger());
         $this->client->addConnection($connection);
 
-        Phake::verify($this->client)->getStream(Phake::capture($socket));
+        Phake::verify($this->client)->getSocket($this->isType('string'), Phake::capture($actual));
         $expected = array('socket' => array('bindto' => '0.0.0.0:0'));
-        $this->assertSame($expected, stream_context_get_options($socket));
+        $this->assertSame($expected, $actual);
     }
 
     /**
