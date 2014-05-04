@@ -232,13 +232,12 @@ class Client extends EventEmitter implements
     public function getLogger()
     {
         if (!$this->logger) {
-            if (!defined('STDERR')) {
-                // See testGetLoggerRunFromStdin
-                // @codeCoverageIgnoreStart
-                define('STDERR', fopen('php://stderr', 'w'));
-            }
+            // See testGetLoggerRunFromStdin
+            // @codeCoverageIgnoreStart
+            $stderr = defined('STDERR') && !is_null(STDERR)
+                ? STDERR : fopen('php://stderr', 'w');
             // @codeCoverageIgnoreEnd
-            $handler = new StreamHandler(STDERR, Logger::DEBUG);
+            $handler = new StreamHandler($stderr, Logger::DEBUG);
             $handler->setFormatter(new LineFormatter("%datetime% %level_name% %message% %context%\n"));
             $this->logger = new Logger(get_class($this));
             $this->logger->pushHandler($handler);
