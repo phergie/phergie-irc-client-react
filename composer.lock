@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "fdd01213e21b5e65fa08a6168ce8ad24",
+    "hash": "9f4b3ad9af3a7b47596eed67818fdb5c",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -354,16 +354,16 @@
     "packages-dev": [
         {
             "name": "phake/phake",
-            "version": "v2.0.0-beta1",
+            "version": "v2.0.0-beta2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mlively/Phake.git",
-                "reference": "d9732d7d1ffc65e86856e00eca5f3025b3f29442"
+                "reference": "917a5d1e426548ead7910a8cb89336cd8641eba7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mlively/Phake/zipball/d9732d7d1ffc65e86856e00eca5f3025b3f29442",
-                "reference": "d9732d7d1ffc65e86856e00eca5f3025b3f29442",
+                "url": "https://api.github.com/repos/mlively/Phake/zipball/917a5d1e426548ead7910a8cb89336cd8641eba7",
+                "reference": "917a5d1e426548ead7910a8cb89336cd8641eba7",
                 "shasum": ""
             },
             "require": {
@@ -406,7 +406,7 @@
                 "mock",
                 "testing"
             ],
-            "time": "2014-04-19 19:26:56"
+            "time": "2014-05-05 14:08:12"
         },
         {
             "name": "phpunit/php-code-coverage",
