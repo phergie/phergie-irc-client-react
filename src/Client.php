@@ -314,15 +314,18 @@ class Client extends EventEmitter implements
      * Returns a callback for when a connection is terminated, whether
      * explicitly by the bot or server or as a result of loss of connectivity.
      *
+     * @param \React\Stream\Stream $stream Stream representing the connection
+     *        to the server
      * @param \Phergie\Irc\ConnectionInterface $connection Terminated connection
      * @return callable
      */
-    protected function getEndCallback(ConnectionInterface $connection)
+    protected function getEndCallback(Stream $stream, ConnectionInterface $connection)
     {
         $client = $this;
         $logger = $this->getLogger();
-        return function() use ($client, $connection, $logger) {
+        return function() use ($client, $stream, $connection, $logger) {
             $client->emit('connect.end', array($connection, $logger));
+            $stream->close();
         };
     }
 
@@ -361,7 +364,7 @@ class Client extends EventEmitter implements
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($write, $connection));
-        $write->on('end', $this->getEndCallback($connection));
+        $write->on('end', $this->getEndCallback($stream, $connection));
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
         $write->on('error', $error);
@@ -408,19 +411,12 @@ class Client extends EventEmitter implements
     {
         $this->emit('connect.before.each', array($connection));
 
-        // Terminate any preexisting connection
-        $stream = $connection->getOption('stream');
-        if ($stream !== null) {
-            $this->getLoop()->removeStream($stream);
-        }
-
         // Establish the socket connection
         $remote = $this->getRemote($connection);
         $context = $this->getContext($connection);
         try {
             $socket = $this->getSocket($remote, $context);
             $stream = $this->getStream($socket);
-            $connection->setOption('stream', $stream);
 
             $write = $this->getWriteStream($connection);
             $this->configureStreams($connection, $stream, $write);

@@ -235,38 +235,6 @@ EOF;
     }
 
     /**
-     * Tests addConnection() with a previously added connection.
-     */
-    public function testAddConnectionWithPreviouslyAddedConnection()
-    {
-        $connection = $this->getMockConnectionForAddConnection();
-        $writeStream = $this->getMockWriteStream();
-        $loop = $this->getMockLoop();
-        $oldStream = $this->getMockStream();
-        Phake::when($this->client)->getLoop()->thenReturn($loop);
-        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
-        Phake::when($connection)->getOption('stream')->thenReturn($oldStream);
-
-        $this->client->setLogger($this->getMockLogger());
-        $this->client->addConnection($connection);
-
-        Phake::inOrder(
-            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
-            Phake::verify($loop)->removeStream($oldStream),
-            Phake::verify($connection)->setOption('stream',
-                $this->logicalAnd(
-                    $this->isInstanceOf('\React\Stream\Stream'),
-                    $this->logicalNot($this->identicalTo($oldStream))
-                )
-            ),
-            Phake::verify($writeStream)->ircPass('password'),
-            Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
-            Phake::verify($writeStream)->ircNick('nickname'),
-            Phake::verify($this->client)->emit('connect.after.each', array($connection))
-        );
-    }
-
-    /**
      * Tests addConnection() with a connection configured to force usage of
      * IPv4.
      */
@@ -395,6 +363,8 @@ EOF;
         $connection = $this->getMockConnectionForAddConnection();
         $logger = $this->getMockLogger();
         $writeStream = $this->getMockWriteStream();
+        $stream = $this->getMockStream();
+        Phake::when($this->client)->getStream(Phake::anyParameters())->thenReturn($stream);
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
         $this->client->setLogger($logger);
@@ -407,6 +377,7 @@ EOF;
         $this->assertCount(2, $params);
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
+        Phake::verify($stream)->close();
     }
 
     /**
