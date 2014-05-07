@@ -87,6 +87,7 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($msg, call_user_func_array(array($write, $method), $arguments));
 
         Phake::verify($write)->emit('data', array($msg));
+        Phake::verify($write, Phake::times($method == 'ircQuit' ? 1 : 0))->close();
     }
 
     /**

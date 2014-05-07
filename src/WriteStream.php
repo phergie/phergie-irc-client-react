@@ -129,6 +129,7 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     {
         $msg = $this->getGenerator()->ircQuit($message);
         $this->emit('data', array($msg));
+        $this->close();
         return $msg;
     }
 
