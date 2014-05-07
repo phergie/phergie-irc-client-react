@@ -10,6 +10,8 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Phake;
+
 /**
  * Tests for \Phergie\Irc\Client\React\ReadStream.
  *
@@ -24,7 +26,7 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
     public function testSetParser()
     {
         $read = new ReadStream;
-        $parser = $this->getMock('\Phergie\Irc\ParserInterface');
+        $parser = $this->getMockParser();
         $read->setParser($parser);
         $this->assertSame($parser, $read->getParser());
     }
@@ -56,43 +58,26 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
             'message' => "PRIVMSG #channel :message\r\n"
         );
 
-        // Due to limitations in call_user_func*, specifically that it does not
-        // pass parameters by reference and that call-time pass-by-reference is
-        // deprecated in PHP 5.4, there's no supported way to simulate
-        // modification of the $all parameter of consumeAll(), which is
-        // received by reference, within the stub callback for consumeAll().
-        // The most that can be tested here is that write() will retain the
-        // remainder of the data stream (i.e. all of it if consumeAll() does
-        // not modify it, which it won't if the stream does not contain a
-        // complete message) after its first invocation of consumeAll(), then
-        // prepend that remainder to the $data parameter value passed to it
-        // before it invokes consumeAll() again.
-        $parser = $this->getMock('\Phergie\Irc\ParserInterface');
-        $parser
-            ->expects($this->at(0))
-            ->method('consumeAll')
-            ->with($data1)
-            ->will($this->returnValue(array()));
-        $parser
-            ->expects($this->at(1))
-            ->method('consumeAll')
-            ->with($data1 . $data2 . "\r\n")
-            ->will($this->returnCallback(function() use ($parsed) {
+        $parser = $this->getMockParser();
+        Phake::when($parser)
+            ->consumeAll($data1)
+            ->thenReturn(array());
+        $all = $data1 . $data2 . "\r\n";
+        Phake::when($parser)
+            ->consumeAll(Phake::setReference('')->when($all))
+            ->thenGetReturnByLambda(function() use ($parsed) {
                 return array($parsed);
-            }));
+            });
 
-        $read = $this->getMock('\Phergie\Irc\Client\React\ReadStream', array('emit'));
-        $read
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('data', array($parsed['message']));
-        $read
-            ->expects($this->at(1))
-            ->method('emit')
-            ->with('irc.received', array($parsed));
+        $read = $this->getMockReadStream();
         $read->setParser($parser);
         $read->write($data1);
         $read->write($data2 . "\r\n");
+
+        Phake::inOrder(
+            Phake::verify($read)->emit('data', array($parsed['message'])),
+            Phake::verify($read)->emit('irc.received', array($parsed))
+        );
     }
 
     /**
@@ -113,23 +98,38 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
             'message' => ":Angel PRIVMSG Wiz :Hello are you receiving this message ?\r\n",
         );
 
-        $parser = $this->getMock('\Phergie\Irc\ParserInterface');
-        $parser
-            ->expects($this->once())
-            ->method('consumeAll')
-            ->with($parsed['message'])
-            ->will($this->returnValue(array($parsed)));
+        $parser = $this->getMockParser();
+        Phake::when($parser)
+            ->consumeAll($parsed['message'])
+            ->thenReturn(array($parsed));
 
-        $read = $this->getMock('\Phergie\Irc\Client\React\ReadStream', array('emit'));
-        $read
-            ->expects($this->at(0))
-            ->method('emit')
-            ->with('data', array($parsed['message']));
-        $read
-            ->expects($this->at(1))
-            ->method('emit')
-            ->with('irc.received', array($parsed));
+        $read = $this->getMockReadStream();
         $read->setParser($parser);
         $read->write($parsed['message']);
+
+        Phake::inOrder(
+            Phake::verify($read)->emit('data', array($parsed['message'])),
+            Phake::verify($read)->emit('irc.received', array($parsed))
+        );
+    }
+
+    /**
+     * Returns a mock parser.
+     *
+     * @return \Phergie\Irc\ParserInterface
+     */
+    protected function getMockParser()
+    {
+        return Phake::mock('\Phergie\Irc\ParserInterface');
+    }
+
+    /**
+     * Returns a partial mock read stream.
+     *
+     * @return \Phergie\Irc\Client\React\ReadStream
+     */
+    protected function getMockReadStream()
+    {
+        return Phake::partialMock('\Phergie\Irc\Client\React\ReadStream');
     }
 }

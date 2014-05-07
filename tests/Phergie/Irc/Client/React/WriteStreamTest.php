@@ -10,6 +10,8 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Phake;
+
 /**
  * Tests for \Phergie\Irc\Client\React\WriteStream.
  *
@@ -41,7 +43,7 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
     public function testSetGenerator()
     {
         $write = new WriteStream();
-        $generator = $this->getMock('\Phergie\Irc\GeneratorInterface');
+        $generator = $this->getMockGenerator();
         $write->setGenerator($generator);
         $this->assertSame($generator, $write->getGenerator());
     }
@@ -52,14 +54,11 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
     public function testSetPrefix()
     {
         $prefix = 'prefix-string';
-        $generator = $this->getMock('\Phergie\Irc\GeneratorInterface');
-        $generator
-            ->expects($this->once())
-            ->method('setPrefix')
-            ->with($prefix);
+        $generator = $this->getMockGenerator();
         $write = new WriteStream;
         $write->setGenerator($generator);
         $write->setPrefix($prefix);
+        Phake::verify($generator, Phake::times(1))->setPrefix($prefix);
     }
 
     /**
@@ -73,23 +72,21 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
     {
         $msg = $method . '_msg';
 
-        $generator = $this->getMock('\Phergie\Irc\GeneratorInterface');
-        $mocker = $generator
-            ->expects($this->once())
-            ->method($method);
+        $generator = $this->getMockGenerator();
+        $mocker = Phake::when($generator);
         if ($arguments) {
-            call_user_func_array(array($mocker, 'with'), $arguments);
+            $mocker = call_user_func_array(array($mocker, $method), $arguments);
+        } else {
+            $mocker = $mocker->$method();
         }
-        $mocker->will($this->returnValue($msg));
+        $mocker->thenReturn($msg);
 
-        $write = $this->getMock('\Phergie\Irc\Client\React\WriteStream', array('emit'));
-        $write
-            ->expects($this->once())
-            ->method('emit')
-            ->with('data', array($msg));
+        $write = Phake::partialMock('\Phergie\Irc\Client\React\WriteStream');
         $write->setGenerator($generator);
 
         $this->assertSame($msg, call_user_func_array(array($write, $method), $arguments));
+
+        Phake::verify($write)->emit('data', array($msg));
     }
 
     /**
@@ -157,5 +154,15 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
             array('ctcpTime', array('receivers')),
             array('ctcpTimeResponse', array('nickname', 'time')),
         );
+    }
+
+    /**
+     * Returns a mock generator.
+     *
+     * @return \Phergie\Irc\GeneratorInterface
+     */
+    protected function getMockGenerator()
+    {
+        return Phake::mock('\Phergie\Irc\GeneratorInterface');
     }
 }
