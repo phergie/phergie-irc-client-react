@@ -317,14 +317,18 @@ class Client extends EventEmitter implements
      * @param \React\Stream\Stream $stream Stream representing the connection
      *        to the server
      * @param \Phergie\Irc\ConnectionInterface $connection Terminated connection
+     * @param \React\EventLoop\Timer\TimerInterface $timer Timer used to handle
+     *        asynchronously queued events on the connection, which must be
+     *        cancelled
      * @return callable
      */
-    protected function getEndCallback(Stream $stream, ConnectionInterface $connection)
+    protected function getEndCallback(Stream $stream, ConnectionInterface $connection, TimerInterface $timer)
     {
         $client = $this;
         $logger = $this->getLogger();
-        return function() use ($client, $stream, $connection, $logger) {
+        return function() use ($client, $stream, $connection, $timer, $logger) {
             $client->emit('connect.end', array($connection, $logger));
+            $client->cancelTimer($timer);
             $stream->close();
         };
     }
@@ -360,15 +364,15 @@ class Client extends EventEmitter implements
      */
     protected function configureStreams(ConnectionInterface $connection, Stream $stream, WriteStream $write)
     {
+        $timer = $this->addPeriodicTimer($this->getTickInterval(), $this->getTickCallback($write, $connection));
         $read = $this->getReadStream($connection);
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($write, $connection));
-        $write->on('end', $this->getEndCallback($stream, $connection));
+        $write->on('end', $this->getEndCallback($stream, $connection, $timer));
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
         $write->on('error', $error);
-        $this->addPeriodicTimer($this->getTickInterval(), $this->getTickCallback($write, $connection));
     }
 
     /**

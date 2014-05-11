@@ -362,11 +362,15 @@ EOF;
     {
         $connection = $this->getMockConnectionForAddConnection();
         $logger = $this->getMockLogger();
+        $loop = $this->getMockLoop();
         $writeStream = $this->getMockWriteStream();
         $stream = $this->getMockStream();
+        $timer = $this->getMockTimer();
         Phake::when($this->client)->getStream(Phake::anyParameters())->thenReturn($stream);
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($loop)->addPeriodicTimer(0.2, $this->isType('callable'))->thenReturn($timer);
 
+        $this->client->setLoop($loop);
         $this->client->setLogger($logger);
         $this->client->addConnection($connection);
 
@@ -377,6 +381,7 @@ EOF;
         $this->assertCount(2, $params);
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
+        Phake::verify($loop)->cancelTimer($timer);
         Phake::verify($stream)->close();
     }
 
@@ -389,7 +394,9 @@ EOF;
         $logger = $this->getMockLogger();
         $loop = $this->getMockLoop();
         $writeStream = $this->getMockWriteStream();
+        $timer = $this->getMockTimer();
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($loop)->addPeriodicTimer(0.2, $this->isType('callable'))->thenReturn($timer);
 
         $this->client->setLoop($loop);
         $this->client->setLogger($logger);
