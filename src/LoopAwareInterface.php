@@ -20,5 +20,10 @@ use React\EventLoop\LoopInterface;
  */
 interface LoopAwareInterface
 {
+    /**
+     * Sets the event loop for the implementing class to use.
+     *
+     * @param \React\EventLoop\LoopInterface $loop
+     */
     public function setLoop(LoopInterface $loop);
 }

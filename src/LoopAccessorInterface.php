@@ -19,6 +19,8 @@ namespace Phergie\Irc\Client\React;
 interface LoopAccessorInterface
 {
     /**
+     * Returns the event loop in use by the implementing class.
+     *
      * @return \React\EventLoop\LoopInterface
      */
     public function getLoop();

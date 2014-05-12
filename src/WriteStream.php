@@ -52,6 +52,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->setPrefix().
+     *
      * @param string $prefix
      */
     public function setPrefix($prefix)
@@ -60,7 +62,9 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
-     * @parm string $password
+     * Implements \Phergie\Irc\GeneratorInterface->ircPass().
+     *
+     * @param string $password
      * @return string
      */
     public function ircPass($password)
@@ -71,6 +75,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircNick().
+     *
      * @param string $nickname
      * @param int $hopcount
      * @return string
@@ -83,6 +89,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircUser().
+     *
      * @param string $username
      * @param string $hostname
      * @param string $servername
@@ -97,6 +105,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircServer().
+     *
      * @param string $servername
      * @param int $hopcount
      * @param string $info
@@ -110,6 +120,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircOper().
+     *
      * @param string $user
      * @param string $password
      * @return string
@@ -122,6 +134,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircQuit().
+     *
      * @param string $message
      * @return string
      */
@@ -134,6 +148,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircSquit().
+     *
      * @param string $server
      * @param string $comment
      * @return string
@@ -146,6 +162,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircJoin().
+     *
      * @param string $channels
      * @param string $keys
      * @return string
@@ -158,6 +176,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircPart().
+     *
      * @param string $channels
      * @return string
      */
@@ -169,6 +189,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircMode().
+     *
      * @param string $target
      * @param string $mode
      * @param string $param
@@ -182,6 +204,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircTopic().
+     *
      * @param string $channel
      * @param string $topic
      * @return string
@@ -194,6 +218,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircNames().
+     *
      * @param string $channels
      * @return string
      */
@@ -205,6 +231,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircList().
+     *
      * @param string $channels
      * @param string $server
      * @return string
@@ -217,6 +245,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircInvite().
+     *
      * @param string $nickname
      * @param string $channel
      * @return string
@@ -229,6 +259,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircKick().
+     *
      * @param string $channel
      * @param string $user
      * @param string $comment
@@ -242,6 +274,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircVersion().
+     *
      * @param string $server
      * @return string
      */
@@ -253,6 +287,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircStats().
+     *
      * @param string $query
      * @param string $server
      * @return string
@@ -265,6 +301,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircLinks().
+     *
      * @param string $servermask
      * @param string $remoteserver
      * @return string
@@ -277,6 +315,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircTime().
+     *
      * @param string $server
      * @return string
      */
@@ -288,6 +328,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircConnect().
+     *
      * @param string $targetserver
      * @param int $port
      * @param string $remoteserver
@@ -301,6 +343,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircTrace().
+     *
      * @param string $server
      * @return string
      */
@@ -312,6 +356,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircAdmin().
+     *
      * @param string $server
      * @return string
      */
@@ -323,6 +369,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircInfo().
+     *
      * @param string $server
      * @return string
      */
@@ -334,6 +382,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircPrivmsg().
+     *
      * @param string $receivers
      * @param string $text
      * @return string
@@ -346,6 +396,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircNotice().
+     *
      * @param string $nickname
      * @param string $text
      * @return string
@@ -358,6 +410,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircWho().
+     *
      * @param string $name
      * @param string $o
      * @return string
@@ -370,6 +424,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircWhois().
+     *
      * @param string $server
      * @param string $nickmasks
      * @return string
@@ -382,6 +438,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircWhowas().
+     *
      * @param string $nickname
      * @param int $count
      * @param string $server
@@ -395,6 +453,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircKill().
+     *
      * @param string $nickname
      * @param string $comment
      * @return string
@@ -407,6 +467,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircPing().
+     *
      * @param string $server1
      * @param string $server2
      * @return string
@@ -419,6 +481,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircPong().
+     *
      * @param string $daemon
      * @param string $daemon2
      * @return string
@@ -431,6 +495,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircError().
+     *
      * @param string $message
      * @return string
      */
@@ -442,6 +508,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircAway().
+     *
      * @param string $message
      * @return string
      */
@@ -453,6 +521,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircRehash().
+     *
      * @return string
      */
     public function ircRehash()
@@ -463,6 +533,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircRestart().
+     *
      * @return string
      */
     public function ircRestart()
@@ -473,6 +545,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircSummon().
+     *
      * @param string $user
      * @param string $server
      * @return string
@@ -485,6 +559,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircUsers().
+     *
      * @param string $server
      * @return string
      */
@@ -496,6 +572,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircWallops().
+     *
      * @param string $text
      * @return string
      */
@@ -507,6 +585,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircUserhost().
+     *
      * @param string $nickname1
      * @param string $nickname2
      * @param string $nickname3
@@ -522,6 +602,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircIson().
+     *
      * @param string $nicknames
      * @return string
      */
@@ -533,6 +615,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
     
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpAction().
+     *
      * @param string $receivers 
      * @param string $action
      * @return string
@@ -545,6 +629,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpActionResponse().
+     *
      * @param string $nickname
      * @param string $action
      * @return string
@@ -557,6 +643,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpFinger().
+     *
      * @param string $receivers
      * @return string
      */
@@ -568,6 +656,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpFingerResponse().
+     *
      * @param string $nickname
      * @param string $text
      * @return string
@@ -580,6 +670,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpVersion().
+     *
      * @param string $receivers
      * @return string
      */
@@ -591,6 +683,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpVersionResponse().
+     *
      * @param string $nickname
      * @param string $name
      * @param string $version
@@ -605,6 +699,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpSource().
+     *
      * @param string $receivers
      * @return string
      */
@@ -616,6 +712,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpSourceResponse().
+     *
      * @param string $nickname
      * @param string $host
      * @param string $directories
@@ -630,6 +728,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpUserinfo().
+     *
      * @param string $receivers
      * @return string
      */
@@ -641,6 +741,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpUserinfoResponse().
+     *
      * @param string $nickname
      * @param string $text
      * @return string
@@ -653,6 +755,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpCientinfo().
+     *
      * @param string $receivers
      * @return string
      */
@@ -664,6 +768,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpClientinfoResponse().
+     *
      * @param string $nickname
      * @param string $client
      * @return string
@@ -676,6 +782,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpErrmsg().
+     *
      * @param string $receivers
      * @param string $query
      * @return string
@@ -688,6 +796,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpErrmsgResponse().
+     *
      * @param string $nickname
      * @param string $query
      * @param string $message
@@ -701,6 +811,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpPing().
+     *
      * @param string $receivers
      * @param int $timestamp
      * @return string
@@ -713,6 +825,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpPingResponse().
+     *
      * @param string $nickname
      * @param int $timestamp
      * @return string
@@ -725,6 +839,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpTime().
+     *
      * @param string $receivers
      * @return string
      */
@@ -736,6 +852,8 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     }
 
     /**
+     * Implements \Phergie\Irc\GeneratorInterface->ctcpTimeResponse().
+     *
      * @param string $nickname
      * @param string $time
      * @return string
