@@ -104,7 +104,7 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
             array('ircQuit', array('message')),
             array('ircSquit', array('server', 'comment')),
             array('ircJoin', array('channels', 'keys')),
-            array('ircPart', array('channels')),
+            array('ircPart', array('channels', 'message')),
             array('ircMode', array('target', 'mode', 'param')),
             array('ircTopic', array('channel', 'topic')),
             array('ircNames', array('channels')),

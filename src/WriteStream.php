@@ -179,11 +179,12 @@ class WriteStream extends ReadableStream implements GeneratorInterface
      * Implements \Phergie\Irc\GeneratorInterface->ircPart().
      *
      * @param string $channels
+     * @param string|null $message
      * @return string
      */
-    public function ircPart($channels)
+    public function ircPart($channels, $message = null)
     {
-        $msg = $this->getGenerator()->ircPart($channels);
+        $msg = $this->getGenerator()->ircPart($channels, $message);
         $this->emit('data', array($msg));
         return $msg;
     }
