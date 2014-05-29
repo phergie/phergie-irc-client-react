@@ -96,6 +96,44 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests setResolver().
+     */
+    public function testSetResolver()
+    {
+        $this->client->setLoop($this->getMockLoop());
+        $resolver = $this->getMockResolver();
+        $this->client->setResolver($resolver);
+        $this->assertSame($resolver, $this->client->getResolver());
+    }
+
+    /**
+     * Tests getResolver().
+     */
+    public function testGetResolver()
+    {
+        $this->client->setLoop($this->getMockLoop());
+        $this->assertInstanceOf('\React\Dns\Resolver\Resolver', $this->client->getResolver());
+    }
+
+    /**
+     * Tests setDnsServer().
+     */
+    public function testSetDnsServer()
+    {
+        $ip = '1.2.3.4';
+        $this->client->setDnsServer($ip);
+        $this->assertSame($ip, $this->client->getDnsServer());
+    }
+
+    /**
+     * Tests getDnsServer().
+     */
+    public function testGetDnsServer()
+    {
+        $this->assertSame('8.8.8.8', $this->client->getDnsServer());
+    }
+
+    /**
      * Tests setLogger().
      */
     public function testSetLogger()
@@ -179,6 +217,7 @@ EOF;
             ->thenThrow($exception);
 
         $this->client->setLoop($this->getMockLoop());
+        $this->client->setResolver($this->getMockResolver());
         $this->client->run($connection);
 
         Phake::inOrder(
@@ -201,6 +240,7 @@ EOF;
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
         $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::inOrder(
@@ -223,6 +263,7 @@ EOF;
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
         $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::inOrder(
@@ -246,6 +287,7 @@ EOF;
         Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
 
         $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($this->client)->getSocket($this->isType('string'), Phake::capture($actual));
@@ -267,6 +309,7 @@ EOF;
         $handler->setFormatter(new LineFormatter("%message%\r\n"));
         $logger->pushHandler($handler);
 
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         $mask = 'nickname!username@0.0.0.0';
@@ -290,6 +333,7 @@ EOF;
         Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
         $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
@@ -317,6 +361,7 @@ EOF;
         Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
         $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($writeStream)->on('data', Phake::capture($callback));
@@ -343,6 +388,7 @@ EOF;
         Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
         $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($readStream)->on('error', Phake::capture($callback));
@@ -351,6 +397,26 @@ EOF;
         $this->assertInternalType('array', $params);
         $this->assertCount(3, $params);
         $this->assertSame($this->message, $params[0]);
+        $this->assertSame($connection, $params[1]);
+        $this->assertSame($logger, $params[2]);
+    }
+
+    /**
+     * Tests that the client emits an event when a dns lookup error occurs.
+     */
+    public function testErrorCallbackResolverReject()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->getMockLogger();
+
+        $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver('string', true));
+        $this->client->addConnection($connection);
+
+        Phake::verify($this->client)->emit('connect.error', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(3, $params);
+        $this->assertSame('Something went wrong', $params[0]);
         $this->assertSame($connection, $params[1]);
         $this->assertSame($logger, $params[2]);
     }
@@ -372,6 +438,7 @@ EOF;
 
         $this->client->setLoop($loop);
         $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($writeStream)->on('end', Phake::capture($callback));
@@ -400,6 +467,7 @@ EOF;
 
         $this->client->setLoop($loop);
         $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
         Phake::verify($loop)->addPeriodicTimer(0.2, Phake::capture($callback));
@@ -424,6 +492,7 @@ EOF;
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
         $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver('null'));
         $this->client->run($connections);
 
         Phake::inOrder(
@@ -446,6 +515,7 @@ EOF;
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
         $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver('null'));
         $this->client->run($connection);
 
         Phake::inOrder(
@@ -589,6 +659,26 @@ EOF;
     }
 
     /**
+     * Returns a mock loop.
+     *
+     * @return \React\Dns\Resolver\Resolver
+     */
+    protected function getMockResolver($type = 'string', $reject = false)
+    {
+        $resolver = Phake::mock('\React\Dns\Resolver\Resolver');
+
+        if ($reject) {
+            $promise = new FakePromiseReject();
+        } else {
+            $promise = new FakePromiseResolve();
+        }
+
+        Phake::when($resolver)->resolve($this->isType($type))->thenReturn($promise);
+
+        return $resolver;
+    }
+
+    /**
      * Returns a mock connection for testing addConnection().
      *
      * @return \Phergie\Irc\ConnectionInterface
@@ -605,5 +695,17 @@ EOF;
         Phake::when($connection)->getServerHostname()->thenReturn('0.0.0.0');
         Phake::when($connection)->getServerPort()->thenReturn($this->port);
         return $connection;
+    }
+}
+
+class FakePromiseResolve {
+    public function then($callback) {
+        $callback('0.0.0.0');
+    }
+}
+
+class FakePromiseReject {
+    public function then($unUsedCallback, $callback) {
+        $callback(new Exception('Something went wrong'));
     }
 }

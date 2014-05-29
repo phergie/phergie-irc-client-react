@@ -16,8 +16,11 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Phergie\Irc\ConnectionInterface;
+use React\Dns\Resolver\Factory;
+use React\Dns\Resolver\Resolver;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
+use React\Promise\Deferred;
 use React\Stream\Stream;
 
 /**
@@ -53,6 +56,16 @@ class Client extends EventEmitter implements
     protected $tickInterval = 0.2;
 
     /**
+     * @var \React\Dns\Resolver\Resolver
+     */
+    protected $resolver;
+
+    /**
+     * @var string
+     */
+    protected $dnsServer = '8.8.8.8';
+
+    /**
      * Sets the event loop dependency.
      *
      * @param \React\EventLoop\LoopInterface $loop
@@ -73,6 +86,51 @@ class Client extends EventEmitter implements
             $this->loop = \React\EventLoop\Factory::create();
         }
         return $this->loop;
+    }
+
+    /**
+     * Sets the DNS Resolver.
+     *
+     * @param Resolver $resolver
+     */
+    public function setResolver(Resolver $resolver = null)
+    {
+        $this->resolver = $resolver;
+    }
+
+    /**
+     * Get the DNS Resolver, if one isn't set in instance will be created.
+     *
+     * @return Resolver
+     */
+    public function getResolver()
+    {
+        if ($this->resolver instanceof Resolver) {
+            return $this->resolver;
+        }
+
+        $factory = new Factory();
+        $this->resolver = $factory->createCached($this->dnsServer, $this->loop);
+
+        return $this->resolver;
+    }
+
+    /**
+     * Set the DNS server to use when looking up IP's
+     *
+     * @param string $dnsServer
+     */
+    public function setDnsServer($dnsServer = '8.8.8.8') {
+        $this->dnsServer = $dnsServer;
+    }
+
+    /**
+     * Returns the configured DNS server
+     *
+     * @return string
+     */
+    public function getDnsServer() {
+        return $this->dnsServer;
     }
 
     /**
@@ -140,8 +198,15 @@ class Client extends EventEmitter implements
         }
         $hostname = $connection->getServerHostname();
         $port = $connection->getServerPort();
-        $remote = $transport . '://' . $hostname . ':' . $port;
-        return $remote;
+
+        $deferred = new Deferred();
+        $this->getResolver()->resolve($hostname)->then(function($ip) use($deferred, $transport, $port) {
+            $deferred->resolve($transport . '://' . $ip . ':' . $port);
+        }, function($error) use ($deferred) {
+            $deferred->reject($error);
+        });
+
+        return $deferred->promise();
     }
 
     /**
@@ -416,27 +481,39 @@ class Client extends EventEmitter implements
         $this->emit('connect.before.each', array($connection));
 
         // Establish the socket connection
-        $remote = $this->getRemote($connection);
-        $context = $this->getContext($connection);
-        try {
-            $socket = $this->getSocket($remote, $context);
-            $stream = $this->getStream($socket);
+        $that = $this;
+        $this->getRemote($connection)->then(function($remote) use($that, &$connection) {
+            $context = $that->getContext($connection);
+            try {
+                $socket = $that->getSocket($remote, $context);
+                $stream = $that->getStream($socket);
+                $connection->setOption('stream', $stream);
 
-            $write = $this->getWriteStream($connection);
-            $this->configureStreams($connection, $stream, $write);
-            $this->identifyUser($connection, $write);
-        } catch (Exception $e) {
-            $this->emit(
+                $write = $that->getWriteStream($connection);
+                $that->configureStreams($connection, $stream, $write);
+                $that->identifyUser($connection, $write);
+            } catch (Exception $e) {
+                $that->emit(
+                    'connect.error',
+                    array(
+                        $e->getMessage(),
+                        $connection,
+                        $that->getLogger()
+                    )
+                );
+            }
+
+            $that->emit('connect.after.each', array($connection));
+        }, function($error) use($that, &$connection) {
+            $that->emit(
                 'connect.error',
                 array(
-                    $e->getMessage(),
+                    $error->getMessage(),
                     $connection,
-                    $this->getLogger()
+                    $that->getLogger()
                 )
             );
-        }
-
-        $this->emit('connect.after.each', array($connection));
+        });
     }
 
     /**
