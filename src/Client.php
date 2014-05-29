@@ -120,7 +120,8 @@ class Client extends EventEmitter implements
      *
      * @param string $dnsServer
      */
-    public function setDnsServer($dnsServer = '8.8.8.8') {
+    public function setDnsServer($dnsServer = '8.8.8.8')
+    {
         $this->dnsServer = $dnsServer;
     }
 
@@ -129,7 +130,8 @@ class Client extends EventEmitter implements
      *
      * @return string
      */
-    public function getDnsServer() {
+    public function getDnsServer()
+    {
         return $this->dnsServer;
     }
 

@@ -698,14 +698,18 @@ EOF;
     }
 }
 
-class FakePromiseResolve {
-    public function then($callback) {
+class FakePromiseResolve
+{
+    public function then($callback)
+    {
         $callback('0.0.0.0');
     }
 }
 
-class FakePromiseReject {
-    public function then($unUsedCallback, $callback) {
+class FakePromiseReject
+{
+    public function then($unUsedCallback, $callback)
+    {
         $callback(new Exception('Something went wrong'));
     }
 }
