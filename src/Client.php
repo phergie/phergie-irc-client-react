@@ -214,10 +214,14 @@ class Client extends EventEmitter implements
     /**
      * Derives a set of socket context options for a given connection.
      *
+     * This method is only public to allow it to be called from addConnection()
+     * without errors under PHP 5.3.x. It should not be called from outside
+     * this class.
+     *
      * @param \Phergie\Irc\ConnectionInterface $connection
      * @return array Associative array of context option key-value pairs
      */
-    protected function getContext(ConnectionInterface $connection)
+    public function getContext(ConnectionInterface $connection)
     {
         $context = array();
         if ($connection->getOption('force-ipv4')) {
@@ -468,6 +472,40 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Initializes an added connection.
+     *
+     * This method is only public to allow it to be called from addConnection()
+     * under PHP 5.3.x. It should not be called outside this class.
+     *
+     * @param string $remote
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    public function initializeConnection($remote, $connection)
+    {
+        $context = $this->getContext($connection);
+        try {
+            $socket = $this->getSocket($remote, $context);
+            $stream = $this->getStream($socket);
+            $connection->setOption('stream', $stream);
+
+            $write = $this->getWriteStream($connection);
+            $this->configureStreams($connection, $stream, $write);
+            $this->identifyUser($connection, $write);
+        } catch (Exception $e) {
+            $this->emit(
+                'connect.error',
+                array(
+                    $e->getMessage(),
+                    $connection,
+                    $this->getLogger()
+                )
+            );
+        }
+
+        $this->emit('connect.after.each', array($connection));
+    }
+
+    /**
      * Initializes an IRC connection.
      *
      * Emits connect.before.each and connect.after.each events before and
@@ -484,38 +522,21 @@ class Client extends EventEmitter implements
 
         // Establish the socket connection
         $that = $this;
-        $this->getRemote($connection)->then(function($remote) use($that, &$connection) {
-            $context = $that->getContext($connection);
-            try {
-                $socket = $that->getSocket($remote, $context);
-                $stream = $that->getStream($socket);
-                $connection->setOption('stream', $stream);
-
-                $write = $that->getWriteStream($connection);
-                $that->configureStreams($connection, $stream, $write);
-                $that->identifyUser($connection, $write);
-            } catch (Exception $e) {
+        $this->getRemote($connection)->then(
+            function($remote) use($that, $connection) {
+                $that->initializeConnection($remote, $connection);
+            },
+            function($error) use($that, $connection) {
                 $that->emit(
                     'connect.error',
                     array(
-                        $e->getMessage(),
+                        $error->getMessage(),
                         $connection,
                         $that->getLogger()
                     )
                 );
             }
-
-            $that->emit('connect.after.each', array($connection));
-        }, function($error) use($that, &$connection) {
-            $that->emit(
-                'connect.error',
-                array(
-                    $error->getMessage(),
-                    $connection,
-                    $that->getLogger()
-                )
-            );
-        });
+        );
     }
 
     /**
