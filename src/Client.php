@@ -110,7 +110,7 @@ class Client extends EventEmitter implements
         }
 
         $factory = new Factory();
-        $this->resolver = $factory->createCached($this->dnsServer, $this->loop);
+        $this->resolver = $factory->createCached($this->getDnsServer(), $this->getLoop());
 
         return $this->resolver;
     }
