@@ -22,6 +22,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
 use React\Stream\Stream;
+use React\Stream\StreamInterface;
 
 /**
  * IRC client implementation based on the React component library.
@@ -236,7 +237,7 @@ class Client extends EventEmitter implements
      *
      * @param resource $socket Socket for the connection to the server
      * @param \React\EventLoop\LoopInterface $loop Event loop
-     * @return \React\Stream\Stream
+     * @return \React\Stream\StreamInterface
      */
     protected function getStream($socket)
     {
@@ -385,15 +386,15 @@ class Client extends EventEmitter implements
      * Returns a callback for when a connection is terminated, whether
      * explicitly by the bot or server or as a result of loss of connectivity.
      *
-     * @param \React\Stream\Stream $stream Stream representing the connection
-     *        to the server
+     * @param \React\Stream\StreamInterface $stream Stream representing the
+     *        connection to the server
      * @param \Phergie\Irc\ConnectionInterface $connection Terminated connection
      * @param \React\EventLoop\Timer\TimerInterface $timer Timer used to handle
      *        asynchronously queued events on the connection, which must be
      *        cancelled
      * @return callable
      */
-    protected function getEndCallback(Stream $stream, ConnectionInterface $connection, TimerInterface $timer)
+    protected function getEndCallback(StreamInterface $stream, ConnectionInterface $connection, TimerInterface $timer)
     {
         $client = $this;
         $logger = $this->getLogger();
@@ -428,12 +429,13 @@ class Client extends EventEmitter implements
      *
      * @param \Phergie\Irc\ConnectionInterface $connection Metadata for the
      *        connection over which messages are being exchanged
-     * @param \React\Stream\Stream $stream Stream representing the connection
+     * @param \React\Stream\StreamInterface $stream Stream representing the
+     *        connection
      *        to the server
      * @param \Phergie\Irc\Client\React\WriteStream $write Stream used to
      *        send events to the server
      */
-    protected function configureStreams(ConnectionInterface $connection, Stream $stream, WriteStream $write)
+    protected function configureStreams(ConnectionInterface $connection, StreamInterface $stream, WriteStream $write)
     {
         $timer = $this->addPeriodicTimer($this->getTickInterval(), $this->getTickCallback($write, $connection));
         $read = $this->getReadStream($connection);
