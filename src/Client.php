@@ -57,6 +57,13 @@ class Client extends EventEmitter implements
     protected $tickInterval = 0.2;
 
     /**
+     * Connector used to establish SSL connections
+     *
+     * @var \React\SocketClient\SecureConnector
+     */
+    protected $secureConnector;
+
+    /**
      * @var \React\Dns\Resolver\Resolver
      */
     protected $resolver;
@@ -188,6 +195,28 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Derives the transport for a given connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return string Transport usable in the URI for a stream
+     */
+    protected function getTransport(ConnectionInterface $connection)
+    {
+        return (string) $connection->getOption('transport') ?: 'tcp';
+    }
+
+    /**
+     * Extracts the value of the force-ipv4 option from a given connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return boolean TRUE to force use of IPv4, FALSE otherwise
+     */
+    protected function getForceIpv4Flag(ConnectionInterface $connection)
+    {
+        return (boolean) $connection->getOption('force-ipv4') ?: false;
+    }
+
+    /**
      * Derives a remote for a given connection.
      *
      * @param \Phergie\Irc\ConnectionInterface $connection
@@ -195,19 +224,20 @@ class Client extends EventEmitter implements
      */
     protected function getRemote(ConnectionInterface $connection)
     {
-        $transport = $connection->getOption('transport');
-        if ($transport === null) {
-            $transport = 'tcp';
-        }
         $hostname = $connection->getServerHostname();
         $port = $connection->getServerPort();
 
         $deferred = new Deferred();
-        $this->getResolver()->resolve($hostname)->then(function($ip) use($deferred, $transport, $port) {
-            $deferred->resolve($transport . '://' . $ip . ':' . $port);
-        }, function($error) use ($deferred) {
-            $deferred->reject($error);
-        });
+        $this->getResolver()
+            ->resolve($hostname)
+            ->then(
+                function($ip) use($deferred, $port) {
+                    $deferred->resolve('tcp://' . $ip . ':' . $port);
+                },
+                function($error) use ($deferred) {
+                    $deferred->reject($error);
+                }
+            );
 
         return $deferred->promise();
     }
@@ -225,7 +255,7 @@ class Client extends EventEmitter implements
     public function getContext(ConnectionInterface $connection)
     {
         $context = array();
-        if ($connection->getOption('force-ipv4')) {
+        if ($this->getForceIpv4Flag($connection)) {
             $context['bindto'] = '0.0.0.0:0';
         }
         $context = array('socket' => $context);
@@ -474,6 +504,114 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Emits a connection error event.
+     *
+     * This method is only public to allow it to be called from
+     * addUnsecuredConnection() under PHP 5.3.x. It should not be called
+     * outside this class.
+     *
+     * @param \Exception $exception
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    public function emitConnectionError(\Exception $exception, ConnectionInterface $connection)
+    {
+        $this->emit(
+            'connect.error',
+            array(
+                $exception->getMessage(),
+                $connection,
+                $this->getLogger()
+            )
+        );
+    }
+
+    /**
+     * Initializes an unsecured connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    protected function addUnsecuredConnection(ConnectionInterface $connection)
+    {
+        $self = $this;
+        $this->getRemote($connection)->then(
+            function($remote) use($self, $connection) {
+                $self->initializeConnection($remote, $connection);
+            },
+            function($error) use($self, $connection) {
+                $self->emitConnectionError($error, $connection);
+            }
+        );
+    }
+
+    /**
+     * Returns a connector for establishing SSL connections.
+     *
+     * @return \React\SocketClient\SecureConnector
+     */
+    protected function getSecureConnector()
+    {
+        if (!$this->secureConnector) {
+            $loop = $this->getLoop();
+            $connector = new \React\SocketClient\Connector($loop, $this->getResolver());
+            $this->secureConnector = new \React\SocketClient\SecureConnector($connector, $loop);
+        }
+        return $this->secureConnector;
+    }
+
+    /**
+     * Initializes a secured connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @throws \Phergie\Irc\Client\React\Exception if the SSL transport and
+     *         forcing IPv4 usage are both enabled
+     */
+    protected function addSecureConnection(ConnectionInterface $connection)
+    {
+        // @see https://github.com/reactphp/socket-client/issues/4
+        if ($this->getForceIpv4Flag($connection)) {
+            throw new Exception(
+                'Using the SSL transport and IPv4 together is not currently supported',
+                Exception::ERR_CONNECTION_STATE_UNSUPPORTED
+            );
+        }
+
+        $hostname = $connection->getServerHostname();
+        $port = $connection->getServerPort();
+
+        $self = $this;
+        $this->getSecureConnector()
+            ->create($hostname, $port)
+            ->then(
+                function(StreamInterface $stream) use ($self, $connection) {
+                    $self->initializeStream($stream, $connection);
+                    $self->emit('connect.after.each', array($connection));
+                }
+            );
+    }
+
+    /**
+     * Configures an established stream for a given connection.
+     *
+     * This method is only public to allow it to be called from
+     * addSecureConnection() under PHP 5.3.x. It should not be called outside
+     * this class.
+     *
+     * @param \React\Stream\StreamInterface $stream
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    public function initializeStream(StreamInterface $stream, ConnectionInterface $connection)
+    {
+        try {
+            $connection->setOption('stream', $stream);
+            $write = $this->getWriteStream($connection);
+            $this->configureStreams($connection, $stream, $write);
+            $this->identifyUser($connection, $write);
+        } catch (\Exception $e) {
+            $this->emitConnectionError($e, $connection);
+        }
+    }
+
+    /**
      * Initializes an added connection.
      *
      * This method is only public to allow it to be called from addConnection()
@@ -484,24 +622,13 @@ class Client extends EventEmitter implements
      */
     public function initializeConnection($remote, $connection)
     {
-        $context = $this->getContext($connection);
         try {
+            $context = $this->getContext($connection);
             $socket = $this->getSocket($remote, $context);
             $stream = $this->getStream($socket);
-            $connection->setOption('stream', $stream);
-
-            $write = $this->getWriteStream($connection);
-            $this->configureStreams($connection, $stream, $write);
-            $this->identifyUser($connection, $write);
-        } catch (Exception $e) {
-            $this->emit(
-                'connect.error',
-                array(
-                    $e->getMessage(),
-                    $connection,
-                    $this->getLogger()
-                )
-            );
+            $this->initializeStream($stream, $connection);
+        } catch (\Exception $e) {
+            $this->emitConnectionError($e, $connection);
         }
 
         $this->emit('connect.after.each', array($connection));
@@ -522,23 +649,11 @@ class Client extends EventEmitter implements
     {
         $this->emit('connect.before.each', array($connection));
 
-        // Establish the socket connection
-        $that = $this;
-        $this->getRemote($connection)->then(
-            function($remote) use($that, $connection) {
-                $that->initializeConnection($remote, $connection);
-            },
-            function($error) use($that, $connection) {
-                $that->emit(
-                    'connect.error',
-                    array(
-                        $error->getMessage(),
-                        $connection,
-                        $that->getLogger()
-                    )
-                );
-            }
-        );
+        if ($this->getTransport($connection) === 'ssl') {
+            $this->addSecureConnection($connection);
+        } else {
+            $this->addUnsecuredConnection($connection);
+        }
     }
 
     /**

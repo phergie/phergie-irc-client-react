@@ -15,6 +15,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Phake;
 use React\EventLoop\LoopInterface;
+use React\SocketClient\SecureConnector;
+use React\Stream\StreamInterface;
 
 /**
  * Tests for \Phergie\Irc\Client\React\Client.
@@ -320,6 +322,57 @@ EOF;
     }
 
     /**
+     * Tests that adding a connection configured to use the SSL transport and
+     * force use of IPv4 throws an exception.
+     *
+     * @see https://github.com/reactphp/socket-client/issues/4
+     */
+    public function testAddConnectionWithSslTransportAndForceIpv4ThrowsException()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        Phake::when($connection)->getOption('transport')->thenReturn('ssl');
+        Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
+        $this->client->setResolver($this->getMockResolver());
+
+        try {
+            $this->client->addConnection($connection);
+            $this->fail('Expected exception was not thrown');
+        } catch (Exception $e) {
+            $this->assertSame(Exception::ERR_CONNECTION_STATE_UNSUPPORTED, $e->getCode());
+        }
+    }
+
+    /**
+     * Tests that a connect.error event is emitted if a stream initialized
+     * error is encountered.
+     */
+    public function testAddConnectionWithStreamInitializationError()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        Phake::when($connection)->getOption('transport')->thenReturn('ssl');
+
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+
+        $exception = new Exception('message');
+        Phake::when($this->client)->identifyUser($connection, $writeStream)->thenThrow($exception);
+
+        Phake::when($this->client)->getSecureConnector()->thenReturn($this->getMockSecureConnector());
+
+        $logger = $this->getMockLogger();
+
+        $this->client->setLogger($logger);
+        $this->client->setLoop($this->getMockLoop());
+        $this->client->addConnection($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.each', array($connection)),
+            Phake::verify($this->client)->emit('connect.error', array($exception->getMessage(), $connection, $logger)),
+            Phake::verify($this->client)->emit('connect.after.each', array($connection))
+        );
+    }
+
+    /**
      * Tests that the client emits an event when it receives a message from the
      * server.
      */
@@ -527,6 +580,29 @@ EOF;
     }
 
     /**
+     * Tests run() with a connection configured to use the SSL transport.
+     */
+    public function testRunWithConnectionUsingSslTransport()
+    {
+        $loop = $this->getMockLoop();
+        $connection = $this->getMockConnectionForAddConnection();
+        $connections = array($connection);
+        Phake::when($connection)->getOption('transport')->thenReturn('ssl');
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver('null'));
+        $this->client->run($connection);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.all', array($connections)),
+            Phake::verify($this->client)->addConnection($connection),
+            Phake::verify($this->client)->emit('connect.after.all', array($connections)),
+            Phake::verify($loop, Phake::times(1))->run()
+        );
+    }
+
+    /**
      * Tests addTimer().
      */
     public function testAddTimer()
@@ -655,7 +731,9 @@ EOF;
      */
     protected function getMockLoop()
     {
-        return Phake::mock('\React\EventLoop\LoopInterface');
+        $loop = Phake::mock('\React\EventLoop\LoopInterface');
+        Phake::when($loop)->addPeriodicTimer(Phake::anyParameters())->thenReturn($this->getMockTimer());
+        return $loop;
     }
 
     /**
@@ -668,14 +746,27 @@ EOF;
         $resolver = Phake::mock('\React\Dns\Resolver\Resolver');
 
         if ($reject) {
-            $promise = new FakePromiseReject();
+            $promise = new FakePromiseReject(new Exception('Something went wrong'));
         } else {
-            $promise = new FakePromiseResolve();
+            $promise = new FakePromiseResolve('0.0.0.0');
         }
 
         Phake::when($resolver)->resolve($this->isType($type))->thenReturn($promise);
 
         return $resolver;
+    }
+
+    /**
+     * Returns a mock secure connector.
+     *
+     * @return \React\SocketClient\SecureConnector
+     */
+    protected function getMockSecureConnector()
+    {
+        $connector = Phake::mock('\React\SocketClient\SecureConnector');
+        $promise = new FakePromiseResolve($this->getMockStream());
+        Phake::when($connector)->create('0.0.0.0', $this->port)->thenReturn($promise);
+        return $connector;
     }
 
     /**
@@ -698,18 +789,28 @@ EOF;
     }
 }
 
-class FakePromiseResolve
+class FakePromise
 {
-    public function then($callback)
+    protected $args;
+
+    public function __construct()
     {
-        $callback('0.0.0.0');
+        $this->args = func_get_args();
     }
 }
 
-class FakePromiseReject
+class FakePromiseResolve extends FakePromise
+{
+    public function then($callback)
+    {
+        call_user_func_array($callback, $this->args);
+    }
+}
+
+class FakePromiseReject extends FakePromise
 {
     public function then($unUsedCallback, $callback)
     {
-        $callback(new Exception('Something went wrong'));
+        call_user_func_array($callback, $this->args);
     }
 }

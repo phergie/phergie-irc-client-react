@@ -22,4 +22,9 @@ class Exception extends \Exception
      * An attempt to establish a connection to a server failed
      */
     const ERR_CONNECTION_ATTEMPT_FAILED = 1;
+
+    /**
+     * A connection has an unsupported configuration state
+     */
+    const ERR_CONNECTION_STATE_UNSUPPORTED = 2;
 }
