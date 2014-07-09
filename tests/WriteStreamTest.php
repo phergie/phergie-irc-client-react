@@ -8,9 +8,10 @@
  * @package Phergie\Irc\Client\React
  */
 
-namespace Phergie\Irc\Client\React;
+namespace Phergie\Irc\Tests\Client\React;
 
 use Phake;
+use Phergie\Irc\Client\React\WriteStream;
 
 /**
  * Tests for \Phergie\Irc\Client\React\WriteStream.

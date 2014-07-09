@@ -8,12 +8,13 @@
  * @package Phergie\Irc\Client\React
  */
 
-namespace Phergie\Irc\Client\React;
+namespace Phergie\Irc\Tests\Client\React;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Phake;
+use Phergie\Irc\Client\React\Exception;
 use React\EventLoop\LoopInterface;
 use React\SocketClient\SecureConnector;
 use React\Stream\StreamInterface;
@@ -183,7 +184,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $port = $this->port;
         $code = <<<EOF
 <?php
-require '$dir/../../../../../vendor/autoload.php';
+require '$dir/../vendor/autoload.php';
 \$client = new \Phergie\Irc\Client\React\Client;
 \$logger = \$client->getLogger();
 \$logger->debug("test");
