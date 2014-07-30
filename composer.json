@@ -15,7 +15,7 @@
         "phergie/phergie-irc-parser": "dev-master",
         "phergie/phergie-irc-generator": "dev-master",
         "phergie/phergie-irc-connection": "dev-master",
-        "react/event-loop": "0.3.*",
+        "react/event-loop": ">=0.3.0,<0.5.0",
         "react/stream": "0.3.*",
         "react/dns": "0.3.*",
         "react/promise": "1.0.*",

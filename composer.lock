@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "02f1721cfad1c851d41708629b7b85bb",
+    "hash": "567c2c95c030f8a10b5b81c60df4c0a0",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -119,12 +119,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
-                "reference": "de3ee132fb22e184cd2f237865218b56a92a56cd"
+                "reference": "2bde216f91ff6b7c51bdd77abe356d8c658fa742"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/de3ee132fb22e184cd2f237865218b56a92a56cd",
-                "reference": "de3ee132fb22e184cd2f237865218b56a92a56cd",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-connection/zipball/2bde216f91ff6b7c51bdd77abe356d8c658fa742",
+                "reference": "2bde216f91ff6b7c51bdd77abe356d8c658fa742",
                 "shasum": ""
             },
             "require": {
@@ -150,7 +150,7 @@
                 "irc",
                 "server"
             ],
-            "time": "2014-05-04 23:04:11"
+            "time": "2014-07-09 03:24:32"
         },
         {
             "name": "phergie/phergie-irc-generator",
@@ -158,12 +158,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-generator.git",
-                "reference": "dbb02b802a83f94e3fbd4783dc72f2801b9e9b7e"
+                "reference": "402a9c9dc341a8d5902faae11a9459ed41a59767"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/dbb02b802a83f94e3fbd4783dc72f2801b9e9b7e",
-                "reference": "dbb02b802a83f94e3fbd4783dc72f2801b9e9b7e",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-generator/zipball/402a9c9dc341a8d5902faae11a9459ed41a59767",
+                "reference": "402a9c9dc341a8d5902faae11a9459ed41a59767",
                 "shasum": ""
             },
             "require": {
@@ -187,7 +187,7 @@
                 "generator",
                 "irc"
             ],
-            "time": "2014-05-04 19:45:43"
+            "time": "2014-07-09 03:24:35"
         },
         {
             "name": "phergie/phergie-irc-parser",
@@ -195,12 +195,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser.git",
-                "reference": "6f2eebc0bb3ebacde59415fb827229062d6c227e"
+                "reference": "712e55ba044ae2f407a61af1b8e692e538337014"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/6f2eebc0bb3ebacde59415fb827229062d6c227e",
-                "reference": "6f2eebc0bb3ebacde59415fb827229062d6c227e",
+                "url": "https://api.github.com/repos/phergie/phergie-irc-parser/zipball/712e55ba044ae2f407a61af1b8e692e538337014",
+                "reference": "712e55ba044ae2f407a61af1b8e692e538337014",
                 "shasum": ""
             },
             "require": {
@@ -224,7 +224,7 @@
                 "irc",
                 "parser"
             ],
-            "time": "2014-05-04 19:46:59"
+            "time": "2014-07-09 03:24:36"
         },
         {
             "name": "psr/log",
@@ -625,7 +625,7 @@
                 {
                     "name": "Marco Pivetta",
                     "email": "ocramius@gmail.com",
-                    "homepage": "http://ocramius.github.io/",
+                    "homepage": "http://ocramius.github.com/",
                     "role": "Developer"
                 }
             ],
@@ -702,12 +702,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "09a53c29da426623e9a8a416dda1c7ed3b2d3d72"
+                "reference": "d1c08e786a36190c015b1c6756e68e1532ce0d57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/09a53c29da426623e9a8a416dda1c7ed3b2d3d72",
-                "reference": "09a53c29da426623e9a8a416dda1c7ed3b2d3d72",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/d1c08e786a36190c015b1c6756e68e1532ce0d57",
+                "reference": "d1c08e786a36190c015b1c6756e68e1532ce0d57",
                 "shasum": ""
             },
             "require": {
@@ -759,7 +759,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-06-30 09:08:59"
+            "time": "2014-07-29 19:47:53"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -950,12 +950,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "2acad45c14e1366507853074469a262608fcfae8"
+                "reference": "e4c97eee7bf32da7b4706bd81b9299439bbf3a68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2acad45c14e1366507853074469a262608fcfae8",
-                "reference": "2acad45c14e1366507853074469a262608fcfae8",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/e4c97eee7bf32da7b4706bd81b9299439bbf3a68",
+                "reference": "e4c97eee7bf32da7b4706bd81b9299439bbf3a68",
                 "shasum": ""
             },
             "require": {
@@ -1016,7 +1016,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-07-07 11:36:51"
+            "time": "2014-07-29 13:13:35"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1335,7 +1335,8 @@
                 },
                 {
                     "name": "Adam Harvey",
-                    "email": "aharvey@php.net"
+                    "email": "aharvey@php.net",
+                    "role": "Lead"
                 },
                 {
                     "name": "Bernhard Schussek",
@@ -1392,12 +1393,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "4168f7b8e211cdc2d778ab78f35666580a6d7437"
+                "reference": "07ff901ce8b081cf227091b4919d347fa999b2a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/4168f7b8e211cdc2d778ab78f35666580a6d7437",
-                "reference": "4168f7b8e211cdc2d778ab78f35666580a6d7437",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/07ff901ce8b081cf227091b4919d347fa999b2a0",
+                "reference": "07ff901ce8b081cf227091b4919d347fa999b2a0",
                 "shasum": ""
             },
             "require": {
@@ -1432,12 +1433,10 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-07-08 12:21:41"
+            "time": "2014-07-09 09:06:26"
         }
     ],
-    "aliases": [
-
-    ],
+    "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
         "phergie/phergie-irc-parser": 20,
@@ -1447,7 +1446,5 @@
     "platform": {
         "php": ">=5.3.3"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }
