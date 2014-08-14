@@ -90,12 +90,15 @@ Emitted after all connections are established.
 #### Parameters
 
 * `\Phergie\Irc\ConnectionInterface[] $connections` - array of all connection objects
+* `\Phergie\Irc\Client\React\WriteStream[] $writes` - corresponding array of connection write streams
+
+Note that if a connection attempt failed, the value in `$writes` for that connection will be `null`.
 
 #### Example
 
 ```php
 <?php
-$client->on('connect.after.all', function(array $connections) {
+$client->on('connect.after.all', function(array $connections, array $writes) {
     // ...
 });
 ```
@@ -126,12 +129,15 @@ One potentially useful application of this is to institute a delay between conne
 #### Parameters
 
 * `\Phergie\Irc\ConnectionInterface $connection` - object for the established connection
+* `\Phergie\Irc\Client\React\WriteStream|null $write` - write stream for the connection
+
+Note that if the connection attempt failed, `$write` will be `null`.
 
 #### Example
 
 ```php
 <?php
-$client->on('connect.after.each', function(\Phergie\Irc\ConnectionInterface $connection) {
+$client->on('connect.after.each', function(\Phergie\Irc\ConnectionInterface $connection, \Phergie\Irc\Client\React\WriteStream $write) {
     // ...
 });
 ```

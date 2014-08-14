@@ -584,7 +584,7 @@ class Client extends EventEmitter implements
             ->then(
                 function(StreamInterface $stream) use ($self, $connection) {
                     $self->initializeStream($stream, $connection);
-                    $self->emit('connect.after.each', array($connection));
+                    $self->emit('connect.after.each', array($connection, $connection->getOption('write')));
                 }
             );
     }
@@ -604,6 +604,7 @@ class Client extends EventEmitter implements
         try {
             $connection->setOption('stream', $stream);
             $write = $this->getWriteStream($connection);
+            $connection->setOption('write', $write);
             $this->configureStreams($connection, $stream, $write);
             $this->identifyUser($connection, $write);
         } catch (\Exception $e) {
@@ -631,7 +632,7 @@ class Client extends EventEmitter implements
             $this->emitConnectionError($e, $connection);
         }
 
-        $this->emit('connect.after.each', array($connection));
+        $this->emit('connect.after.each', array($connection, $connection->getOption('write')));
     }
 
     /**
@@ -673,10 +674,18 @@ class Client extends EventEmitter implements
         });
 
         $this->emit('connect.before.all', array($connections));
+
         foreach ($connections as $connection) {
             $this->addConnection($connection);
         }
-        $this->emit('connect.after.all', array($connections));
+
+        $writes = array_map(
+            function($connection) {
+                return $connection->getOption('write');
+            },
+            $connections
+        );
+        $this->emit('connect.after.all', array($connections, $writes));
 
         $this->getLoop()->run();
     }
