@@ -245,14 +245,10 @@ class Client extends EventEmitter implements
     /**
      * Derives a set of socket context options for a given connection.
      *
-     * This method is only public to allow it to be called from addConnection()
-     * without errors under PHP 5.3.x. It should not be called from outside
-     * this class.
-     *
      * @param \Phergie\Irc\ConnectionInterface $connection
      * @return array Associative array of context option key-value pairs
      */
-    public function getContext(ConnectionInterface $connection)
+    protected function getContext(ConnectionInterface $connection)
     {
         $context = array();
         if ($this->getForceIpv4Flag($connection)) {
@@ -506,14 +502,10 @@ class Client extends EventEmitter implements
     /**
      * Emits a connection error event.
      *
-     * This method is only public to allow it to be called from
-     * addUnsecuredConnection() under PHP 5.3.x. It should not be called
-     * outside this class.
-     *
      * @param \Exception $exception
      * @param \Phergie\Irc\ConnectionInterface $connection
      */
-    public function emitConnectionError(\Exception $exception, ConnectionInterface $connection)
+    protected function emitConnectionError(\Exception $exception, ConnectionInterface $connection)
     {
         $this->emit(
             'connect.error',
@@ -532,13 +524,12 @@ class Client extends EventEmitter implements
      */
     protected function addUnsecuredConnection(ConnectionInterface $connection)
     {
-        $self = $this;
         $this->getRemote($connection)->then(
-            function($remote) use($self, $connection) {
-                $self->initializeConnection($remote, $connection);
+            function($remote) use($connection) {
+                $this->initializeConnection($remote, $connection);
             },
-            function($error) use($self, $connection) {
-                $self->emitConnectionError($error, $connection);
+            function($error) use($connection) {
+                $this->emitConnectionError($error, $connection);
             }
         );
     }
@@ -578,13 +569,12 @@ class Client extends EventEmitter implements
         $hostname = $connection->getServerHostname();
         $port = $connection->getServerPort();
 
-        $self = $this;
         $this->getSecureConnector()
             ->create($hostname, $port)
             ->then(
-                function(DuplexStreamInterface $stream) use ($self, $connection) {
-                    $self->initializeStream($stream, $connection);
-                    $self->emit('connect.after.each', array($connection, $connection->getOption('write')));
+                function(DuplexStreamInterface $stream) use ($connection) {
+                    $this->initializeStream($stream, $connection);
+                    $this->emit('connect.after.each', array($connection, $connection->getOption('write')));
                 }
             );
     }
@@ -592,14 +582,10 @@ class Client extends EventEmitter implements
     /**
      * Configures an established stream for a given connection.
      *
-     * This method is only public to allow it to be called from
-     * addSecureConnection() under PHP 5.3.x. It should not be called outside
-     * this class.
-     *
      * @param \React\Stream\DuplexStreamInterface $stream
      * @param \Phergie\Irc\ConnectionInterface $connection
      */
-    public function initializeStream(DuplexStreamInterface $stream, ConnectionInterface $connection)
+    protected function initializeStream(DuplexStreamInterface $stream, ConnectionInterface $connection)
     {
         try {
             $connection->setOption('stream', $stream);
@@ -615,13 +601,10 @@ class Client extends EventEmitter implements
     /**
      * Initializes an added connection.
      *
-     * This method is only public to allow it to be called from addConnection()
-     * under PHP 5.3.x. It should not be called outside this class.
-     *
      * @param string $remote
      * @param \Phergie\Irc\ConnectionInterface $connection
      */
-    public function initializeConnection($remote, $connection)
+    protected function initializeConnection($remote, $connection)
     {
         try {
             $context = $this->getContext($connection);
