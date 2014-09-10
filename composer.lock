@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "69c5579157aa75a1452c932839f30a99",
+    "hash": "b35f54e0ec4505c2c8ffdd794b6f3ac0",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -315,12 +315,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/dns.git",
-                "reference": "2f36ddafe682953079222285511a296d34d0cd02"
+                "reference": "e1eaadb8ac637e61d1b642ebed37fa46c568ae9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/dns/zipball/2f36ddafe682953079222285511a296d34d0cd02",
-                "reference": "2f36ddafe682953079222285511a296d34d0cd02",
+                "url": "https://api.github.com/repos/reactphp/dns/zipball/e1eaadb8ac637e61d1b642ebed37fa46c568ae9d",
+                "reference": "e1eaadb8ac637e61d1b642ebed37fa46c568ae9d",
                 "shasum": ""
             },
             "require": {
@@ -349,7 +349,7 @@
                 "dns",
                 "dns-resolver"
             ],
-            "time": "2014-06-21 13:01:45"
+            "time": "2014-08-23 11:13:50"
         },
         {
             "name": "react/event-loop",
@@ -523,16 +523,16 @@
         },
         {
             "name": "react/stream",
-            "version": "dev-master",
+            "version": "v0.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/stream.git",
-                "reference": "b5d221c201dddd4e422475bc503d40b9bf6ff34f"
+                "reference": "acc7a5fec02e0aea674560e1d13c40ed0c8c5465"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/stream/zipball/b5d221c201dddd4e422475bc503d40b9bf6ff34f",
-                "reference": "b5d221c201dddd4e422475bc503d40b9bf6ff34f",
+                "url": "https://api.github.com/repos/reactphp/stream/zipball/acc7a5fec02e0aea674560e1d13c40ed0c8c5465",
+                "reference": "acc7a5fec02e0aea674560e1d13c40ed0c8c5465",
                 "shasum": ""
             },
             "require": {
@@ -567,7 +567,7 @@
                 "pipe",
                 "stream"
             ],
-            "time": "2014-08-20 20:25:49"
+            "time": "2014-09-10 03:32:31"
         }
     ],
     "packages-dev": [
@@ -633,25 +633,25 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "6d196af48e8c100a3ae881940123e693da5a9217"
+                "reference": "62f8cd539ab2e2c25077aeb5f5ed3209acee3612"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6d196af48e8c100a3ae881940123e693da5a9217",
-                "reference": "6d196af48e8c100a3ae881940123e693da5a9217",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/62f8cd539ab2e2c25077aeb5f5ed3209acee3612",
+                "reference": "62f8cd539ab2e2c25077aeb5f5ed3209acee3612",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
-                "phpunit/php-file-iterator": "~1.3.1",
-                "phpunit/php-text-template": "~1.2.0",
-                "phpunit/php-token-stream": "~1.2.2",
-                "sebastian/environment": "~1.0.0",
-                "sebastian/version": "~1.0.3"
+                "phpunit/php-file-iterator": "~1.3",
+                "phpunit/php-text-template": "~1.2",
+                "phpunit/php-token-stream": "~1.3",
+                "sebastian/environment": "~1.0",
+                "sebastian/version": "~1.0"
             },
             "require-dev": {
                 "ext-xdebug": ">=2.1.4",
-                "phpunit/phpunit": "~4.0.14"
+                "phpunit/phpunit": "~4.1"
             },
             "suggest": {
                 "ext-dom": "*",
@@ -690,7 +690,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-08-06 06:39:42"
+            "time": "2014-09-01 22:04:15"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -831,27 +831,30 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "980a02b40496a25ce38acb4d3f4949b77abf9f20"
+                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/980a02b40496a25ce38acb4d3f4949b77abf9f20",
-                "reference": "980a02b40496a25ce38acb4d3f4949b77abf9f20",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/f8d5d08c56de5cfd592b3340424a81733259a876",
+                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
                 "php": ">=5.3.3"
             },
+            "require-dev": {
+                "phpunit/phpunit": "~4.2"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
                 "classmap": [
-                    "PHP/"
+                    "src/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -861,8 +864,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sb@sebastian-bergmann.de",
-                    "role": "lead"
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "Wrapper around PHP's tokenizer extension.",
@@ -870,7 +872,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2014-08-14 16:51:26"
+            "time": "2014-08-31 06:12:13"
         },
         {
             "name": "phpunit/phpunit",
@@ -1177,12 +1179,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/exporter.git",
-                "reference": "8ab105f1fbf947408f69f476aba8ce8180503968"
+                "reference": "c7d59948d6e82818e1bdff7cadb6c34710eb7dc0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/8ab105f1fbf947408f69f476aba8ce8180503968",
-                "reference": "8ab105f1fbf947408f69f476aba8ce8180503968",
+                "url": "https://api.github.com/repos/sebastianbergmann/exporter/zipball/c7d59948d6e82818e1bdff7cadb6c34710eb7dc0",
+                "reference": "c7d59948d6e82818e1bdff7cadb6c34710eb7dc0",
                 "shasum": ""
             },
             "require": {
@@ -1234,7 +1236,7 @@
                 "export",
                 "exporter"
             ],
-            "time": "2014-08-13 23:54:49"
+            "time": "2014-09-10 00:51:36"
         },
         {
             "name": "sebastian/version",
@@ -1278,12 +1280,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Yaml.git",
-                "reference": "d84b97a12046b2c34e8457626b9f2b72dec0c183"
+                "reference": "b5922e0afc21531b84ddef806e66ba4f84f770b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Yaml/zipball/d84b97a12046b2c34e8457626b9f2b72dec0c183",
-                "reference": "d84b97a12046b2c34e8457626b9f2b72dec0c183",
+                "url": "https://api.github.com/repos/symfony/Yaml/zipball/b5922e0afc21531b84ddef806e66ba4f84f770b0",
+                "reference": "b5922e0afc21531b84ddef806e66ba4f84f770b0",
                 "shasum": ""
             },
             "require": {
@@ -1316,23 +1318,17 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "http://symfony.com",
-            "time": "2014-08-05 09:07:51"
+            "time": "2014-08-31 03:28:38"
         }
     ],
     "aliases": [
-        {
-            "alias": "0.4.1",
-            "alias_normalized": "0.4.1.0",
-            "version": "9999999-dev",
-            "package": "react/stream"
-        }
+
     ],
     "minimum-stability": "dev",
     "stability-flags": {
         "phergie/phergie-irc-parser": 20,
         "phergie/phergie-irc-generator": 20,
-        "phergie/phergie-irc-connection": 20,
-        "react/stream": 20
+        "phergie/phergie-irc-connection": 20
     },
     "prefer-stable": false,
     "platform": {
