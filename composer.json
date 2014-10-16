@@ -17,7 +17,7 @@
         "phergie/phergie-irc-connection": "dev-master",
         "react/event-loop": "0.4.*",
         "react/stream": "~0.4.2",
-        "react/socket-client": "0.4.*",
+        "react/socket-client": "~0.4.2",
         "react/dns": "0.4.*",
         "react/promise": "~2.0",
         "psr/log": "~1.0",
