@@ -332,8 +332,8 @@ class Client extends EventEmitter implements
         if (!$this->logger) {
             // See testGetLoggerRunFromStdin
             // @codeCoverageIgnoreStart
-            $stderr = defined('STDERR') && !is_null(STDERR)
-                ? STDERR : fopen('php://stderr', 'w');
+            $stderr = defined('\STDERR') && !is_null(\STDERR)
+                ? \STDERR : fopen('php://stderr', 'w');
             // @codeCoverageIgnoreEnd
             $handler = new StreamHandler($stderr, Logger::DEBUG);
             $handler->setFormatter(new LineFormatter("%datetime% %level_name% %message% %context%\n"));
