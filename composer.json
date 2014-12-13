@@ -12,9 +12,9 @@
     },
     "require": {
         "php": ">=5.4.2",
-        "phergie/phergie-irc-parser": "dev-master",
-        "phergie/phergie-irc-generator": "dev-master",
-        "phergie/phergie-irc-connection": "dev-master",
+        "phergie/phergie-irc-parser": "1.*",
+        "phergie/phergie-irc-generator": "1.*",
+        "phergie/phergie-irc-connection": "1.*",
         "react/event-loop": "0.4.*",
         "react/stream": "~0.4.2",
         "react/socket-client": "~0.4.2",

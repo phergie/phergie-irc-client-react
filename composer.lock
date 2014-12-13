@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9df30d90942c8471258d6b4add1704fe",
+    "hash": "7062d673627dfa6ad7f139d718b65364",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -116,7 +116,7 @@
         },
         {
             "name": "phergie/phergie-irc-connection",
-            "version": "dev-master",
+            "version": "1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-connection.git",
@@ -155,7 +155,7 @@
         },
         {
             "name": "phergie/phergie-irc-generator",
-            "version": "dev-master",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-generator.git",
@@ -192,7 +192,7 @@
         },
         {
             "name": "phergie/phergie-irc-parser",
-            "version": "dev-master",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phergie/phergie-irc-parser.git",
@@ -1321,11 +1321,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "phergie/phergie-irc-parser": 20,
-        "phergie/phergie-irc-generator": 20,
-        "phergie/phergie-irc-connection": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "platform": {
         "php": ">=5.4.2"
