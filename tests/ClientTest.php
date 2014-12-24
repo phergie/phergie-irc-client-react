@@ -15,6 +15,8 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Phake;
 use Phergie\Irc\Client\React\Exception;
+use Phergie\Irc\Client\React\ReadStream;
+use Phergie\Irc\Client\React\WriteStream;
 use React\EventLoop\LoopInterface;
 use React\SocketClient\SecureConnector;
 use React\Stream\StreamInterface;
@@ -123,9 +125,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetDnsServer()
     {
-        $ip = '1.2.3.4';
-        $this->client->setDnsServer($ip);
-        $this->assertSame($ip, $this->client->getDnsServer());
+        $ipAddress = '1.2.3.4';
+        $this->client->setDnsServer($ipAddress);
+        $this->assertSame($ipAddress, $this->client->getDnsServer());
     }
 
     /**
@@ -182,15 +184,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     {
         $dir = __DIR__;
         $port = $this->port;
-        $code = <<<EOF
-<?php
-require '$dir/../vendor/autoload.php';
-\$client = new \Phergie\Irc\Client\React\Client;
-\$logger = \$client->getLogger();
-\$logger->debug("test");
-EOF;
-        $script = tempnam(sys_get_temp_dir(), '');
-        file_put_contents($script, $code);
+        $script = __DIR__ . '/_files/testGetLoggerRunFromStdin.php';
         $null = strcasecmp(substr(PHP_OS, 0, 3), 'win') == 0 ? 'NUL' : '/dev/null';
         $php = defined('PHP_BINARY') ? PHP_BINARY : PHP_BINDIR . '/php';
 
@@ -201,8 +195,6 @@ EOF;
         $command = $php . ' ' . $script . ' 2>&1';
         $output = shell_exec($command);
         $this->assertRegExp('/^[0-9]{4}(-[0-9]{2}){2} [0-9]{2}(:[0-9]{2}){2} DEBUG test \\[\\]$/', $output);
-
-        unlink($script);
     }
 
     /**
@@ -380,15 +372,18 @@ EOF;
     }
 
     /**
-     * Tests that the client emits an event when it receives a message from the
-     * server.
+     * Helper for testing read and write callbacks.
+     *
+     * @param string $onEvent
+     * @param string $emitEvent
+     * @param \Phergie\Irc\Client\React\ReadStream|\Phergie\Irc\Client\React\WriteStream $onStream
+     * @param \Phergie\Irc\Client\React\ReadStream $readStream
+     * @param \Phergie\Irc\Client\React\WriteStream $writeStream
      */
-    public function testReadCallback()
+    protected function doCallbackTest($onEvent, $emitEvent, $onStream, ReadStream $readStream, WriteStream $writeStream)
     {
         $connection = $this->getMockConnectionForAddConnection();
         $logger = $this->getMockLogger();
-        $readStream = $this->getMockReadStream();
-        $writeStream = $this->getMockWriteStream();
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
 
@@ -396,9 +391,9 @@ EOF;
         $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
-        Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
+        Phake::verify($onStream)->on($onEvent, Phake::capture($callback));
         $callback($this->message);
-        Phake::verify($this->client)->emit('irc.received', Phake::capture($params));
+        Phake::verify($this->client)->emit($emitEvent, Phake::capture($params));
         $this->assertInternalType('array', $params);
         $this->assertCount(4, $params);
         $this->assertSame($this->message, $params[0]);
@@ -408,31 +403,37 @@ EOF;
     }
 
     /**
+     * Tests that the client emits an event when it receives a message from the
+     * server.
+     */
+    public function testReadCallback()
+    {
+        $readStream = $this->getMockReadStream();
+        $writeStream = $this->getMockWriteStream();
+        $this->doCallbackTest(
+            'irc.received',
+            'irc.received',
+            $readStream,
+            $readStream,
+            $writeStream
+        );
+    }
+
+    /**
      * Tests that the client emits an event when it sends a message to the
      * server.
      */
     public function testWriteCallback()
     {
-        $connection = $this->getMockConnectionForAddConnection();
-        $logger = $this->getMockLogger();
         $readStream = $this->getMockReadStream();
         $writeStream = $this->getMockWriteStream();
-        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
-        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
-
-        $this->client->setLogger($logger);
-        $this->client->setResolver($this->getMockResolver());
-        $this->client->addConnection($connection);
-
-        Phake::verify($writeStream)->on('data', Phake::capture($callback));
-        $callback($this->message);
-        Phake::verify($this->client)->emit('irc.sent', Phake::capture($params));
-        $this->assertInternalType('array', $params);
-        $this->assertCount(4, $params);
-        $this->assertSame($this->message, $params[0]);
-        $this->assertInstanceOf('\Phergie\Irc\Client\React\WriteStream', $params[1]);
-        $this->assertSame($connection, $params[2]);
-        $this->assertSame($logger, $params[3]);
+        $this->doCallbackTest(
+            'data',
+            'irc.sent',
+            $writeStream,
+            $readStream,
+            $writeStream
+        );
     }
 
     /**
