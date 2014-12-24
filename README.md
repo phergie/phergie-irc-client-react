@@ -3,6 +3,8 @@
 A bare-bones PHP-based IRC client library built on React.
 
 [![Build Status](https://secure.travis-ci.org/phergie/phergie-irc-client-react.png?branch=master)](http://travis-ci.org/phergie/phergie-irc-client-react)
+[![Coverage Status](https://img.shields.io/coveralls/phergie/phergie-irc-client-react.svg)](https://coveralls.io/r/phergie/phergie-irc-client-react)
+[![Code Climate](https://codeclimate.com/github/phergie/phergie-irc-client-react/badges/gpa.svg)](https://codeclimate.com/github/phergie/phergie-irc-client-react)
 
 ## Install
 
