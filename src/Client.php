@@ -173,7 +173,7 @@ class Client extends EventEmitter implements
      */
     protected function getSocket($remote, array $context)
     {
-        $socket = @stream_socket_client(
+        $socket = stream_socket_client(
             $remote,
             $errno,
             $errstr,
