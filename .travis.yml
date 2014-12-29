@@ -9,12 +9,12 @@ php:
 before_script:
   - composer self-update
   - composer install --dev
-  - mkdir -p build/cov
   - mkdir -p build/logs
 
 script:
-  - ./vendor/bin/phpunit --coverage-clover build/cov/clover.xml
+  - ./vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
 after_script:
   - ./vendor/bin/coveralls -v
-  - CODECLIMATE_REPO_TOKEN=d3ada8866be9e0014142368d73317e2d4a90ea3dd25745ff31e087361d352d83 ./vendor/bin/test-reporter --coverage-report=build/cov/clover.xml
+  - CODECLIMATE_REPO_TOKEN="d3ada8866be9e0014142368d73317e2d4a90ea3dd25745ff31e087361d352d83" ./vendor/bin/test-reporter --stdout > codeclimate.json
+  - curl -X POST -d @codeclimate.json -H 'Content-Type: application/json' -H 'User-Agent: Code Climate (PHP Test Reporter v0.1.1)' https://codeclimate.com/test_reports
