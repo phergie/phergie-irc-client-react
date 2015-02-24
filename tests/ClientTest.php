@@ -487,7 +487,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * Tests that the client emits an event when a connection is terminated.
      */
-    public function testEndCallback()
+    public function testWriteTriggeredEndCallback()
     {
         $connection = $this->getMockConnectionForAddConnection();
         $logger = $this->getMockLogger();
@@ -505,6 +505,37 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->client->addConnection($connection);
 
         Phake::verify($writeStream)->on('end', Phake::capture($callback));
+        $callback();
+        Phake::verify($this->client)->emit('connect.end', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(2, $params);
+        $this->assertSame($connection, $params[0]);
+        $this->assertSame($logger, $params[1]);
+        Phake::verify($loop)->cancelTimer($timer);
+        Phake::verify($stream)->close();
+    }
+
+    /**
+     * Tests that the client emits an event when a connection is terminated.
+     */
+    public function testReadTriggeredEndCallback()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $logger = $this->getMockLogger();
+        $loop = $this->getMockLoop();
+        $readStream = $this->getMockReadStream();
+        $stream = $this->getMockStream();
+        $timer = $this->getMockTimer();
+        Phake::when($this->client)->getStream(Phake::anyParameters())->thenReturn($stream);
+        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
+        Phake::when($loop)->addPeriodicTimer(0.2, $this->isType('callable'))->thenReturn($timer);
+
+        $this->client->setLoop($loop);
+        $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
+        $this->client->addConnection($connection);
+
+        Phake::verify($readStream)->on('end', Phake::capture($callback));
         $callback();
         Phake::verify($this->client)->emit('connect.end', Phake::capture($params));
         $this->assertInternalType('array', $params);
