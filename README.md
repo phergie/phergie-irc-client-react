@@ -18,16 +18,6 @@ The recommended method of installation is [through composer](http://getcomposer.
 }
 ```
 
-If you plan to use SSL-enabled connections, you will also need to install [react/socket-client](https://github.com/reactphp/socket-client).
-
-```JSON
-{
-    "require": {
-         "react/socket-client": "0.3.*"
-    }
-}
-```
-
 ## Design goals
 
 * Minimalistic and extensible design
