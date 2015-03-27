@@ -614,6 +614,19 @@ class WriteStream extends ReadableStream implements GeneratorInterface
         $this->emit('data', array($msg));
         return $msg;
     }
+
+    /**
+     * Implements \Phergie\Irc\GeneratorInterface->ircProtoctl().
+     *
+     * @param string $proto
+     * @return string
+     */
+    public function ircProtoctl($proto)
+    {
+        $msg = $this->getGenerator()->ircProtoctl($proto);
+        $this->emit('data', array($msg));
+        return $msg;
+    }
     
     /**
      * Implements \Phergie\Irc\GeneratorInterface->ctcpAction().
