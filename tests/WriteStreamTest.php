@@ -137,6 +137,7 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
             array('ircWallops', array('text')),
             array('ircUserhost', array('nickname1', 'nickname2', 'nickname3', 'nickname4', 'nickname5')),
             array('ircIson', array('nicknames')),
+            array('ircProtoctl', array('proto')),
             array('ctcpAction', array('receivers', 'action')),
             array('ctcpActionResponse', array('nickname', 'action')),
             array('ctcpFinger', array('receivers')),
