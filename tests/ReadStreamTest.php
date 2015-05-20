@@ -66,7 +66,7 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
         $all = $data1 . $data2 . "\r\n";
         Phake::when($parser)
             ->consumeAll(Phake::setReference('')->when($all))
-            ->thenGetReturnByLambda(function() use ($parsed) {
+            ->thenReturnCallback(function() use ($parsed) {
                 return array($parsed);
             });
 

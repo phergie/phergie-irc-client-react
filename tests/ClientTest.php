@@ -756,7 +756,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $write = Phake::mock('\Phergie\Irc\Client\React\WriteStream');
         Phake::when($write)
             ->pipe($this->isInstanceOf('\React\Stream\WritableStreamInterface'))
-            ->thenGetReturnByLambda(function($stream) { return $stream; });
+            ->thenReturnCallback(function($stream) { return $stream; });
         return $write;
     }
 
