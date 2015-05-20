@@ -1,5 +1,4 @@
 {
-    "minimum-stability": "dev",
     "name": "phergie/phergie-irc-client-react",
     "description": "IRC client library built on React",
     "keywords": [ "irc", "client", "react" ],
@@ -24,8 +23,8 @@
         "monolog/monolog": "~1.6"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.1.*",
-        "phake/phake": "2.0.0-beta2",
+        "phpunit/phpunit": "~4.6",
+        "phake/phake": "~2.1",
         "codeclimate/php-test-reporter": "~0.1",
         "satooshi/php-coveralls": "0.6.1",
         "symfony/config": "~2.0",
