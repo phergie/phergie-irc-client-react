@@ -409,21 +409,26 @@ class Client extends EventEmitter implements
      * Returns a callback for when a connection is terminated, whether
      * explicitly by the bot or server or as a result of loss of connectivity.
      *
-     * @param \React\Stream\DuplexStreamInterface $stream Stream representing the
-     *        connection to the server
+     * @param \Phergie\Irc\Client\React\ReadStream $read Read stream for this
+     *        connection
+     * @param \Phergie\Irc\Client\React\WriteStream $write Write stream for this
+     *        connection
      * @param \Phergie\Irc\ConnectionInterface $connection Terminated connection
      * @param \React\EventLoop\Timer\TimerInterface $timer Timer used to handle
      *        asynchronously queued events on the connection, which must be
      *        cancelled
      * @return callable
      */
-    protected function getEndCallback(DuplexStreamInterface $stream, ConnectionInterface $connection, TimerInterface $timer)
+    protected function getEndCallback(ReadStream $read, WriteStream $write, ConnectionInterface $connection, TimerInterface $timer)
     {
         $logger = $this->getLogger();
-        return function() use ($stream, $connection, $timer, $logger) {
+        return function() use ($read, $write, $connection, $timer, $logger) {
             $this->emit('connect.end', array($connection, $logger));
             $this->cancelTimer($timer);
-            $stream->close();
+            $connection->setOption('stream', null);
+            $connection->setOption('write', null);
+            $read->close();
+            $write->close();
         };
     }
 
@@ -463,8 +468,12 @@ class Client extends EventEmitter implements
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($write, $connection));
-        $read->on('end', $this->getEndCallback($stream, $connection, $timer));
-        $write->on('end', $this->getEndCallback($stream, $connection, $timer));
+        $end = function() use ($stream) {
+            $stream->end();
+        };
+        $read->on('end', $end);
+        $write->on('end', $end);
+        $stream->on('end', $this->getEndCallback($read, $write, $connection, $timer));
         $error = $this->getErrorCallback($connection);
         $read->on('error', $error);
         $write->on('error', $error);

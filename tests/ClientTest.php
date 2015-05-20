@@ -504,15 +504,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
-        Phake::verify($writeStream)->on('end', Phake::capture($callback));
-        $callback();
+        Phake::verify($writeStream)->on('end', Phake::capture($streamCloser));
+        call_user_func($streamCloser);
+        Phake::verify($stream)->end();
+
+        Phake::verify($stream)->on('end', Phake::capture($callback));
+        call_user_func($callback);
         Phake::verify($this->client)->emit('connect.end', Phake::capture($params));
         $this->assertInternalType('array', $params);
         $this->assertCount(2, $params);
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
         Phake::verify($loop)->cancelTimer($timer);
-        Phake::verify($stream)->close();
+        Phake::verify($connection)->setOption('stream', null);
+        Phake::verify($connection)->setOption('write', null);
+        Phake::verify($writeStream)->close();
     }
 
     /**
@@ -535,15 +541,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
 
-        Phake::verify($readStream)->on('end', Phake::capture($callback));
-        $callback();
+        Phake::verify($readStream)->on('end', Phake::capture($streamCloser));
+        call_user_func($streamCloser);
+        Phake::verify($stream)->end();
+
+        Phake::verify($stream)->on('end', Phake::capture($callback));
+        call_user_func($callback);
         Phake::verify($this->client)->emit('connect.end', Phake::capture($params));
         $this->assertInternalType('array', $params);
         $this->assertCount(2, $params);
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
         Phake::verify($loop)->cancelTimer($timer);
-        Phake::verify($stream)->close();
+        Phake::verify($connection)->setOption('stream', null);
+        Phake::verify($connection)->setOption('write', null);
+        Phake::verify($readStream)->close();
     }
 
     /**
