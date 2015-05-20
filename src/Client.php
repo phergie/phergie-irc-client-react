@@ -365,10 +365,9 @@ class Client extends EventEmitter implements
      */
     protected function getReadCallback(WriteStream $write, ConnectionInterface $connection)
     {
-        $client = $this;
         $logger = $this->getLogger();
-        return function($message) use ($client, $write, $connection, $logger) {
-            $client->emit('irc.received', array($message, $write, $connection, $logger));
+        return function($message) use ($write, $connection, $logger) {
+            $this->emit('irc.received', array($message, $write, $connection, $logger));
         };
     }
 
@@ -384,10 +383,9 @@ class Client extends EventEmitter implements
      */
     protected function getWriteCallback(WriteStream $write, ConnectionInterface $connection)
     {
-        $client = $this;
         $logger = $this->getLogger();
-        return function($message) use ($client, $write, $connection, $logger) {
-            $client->emit('irc.sent', array($message, $write, $connection, $logger));
+        return function($message) use ($write, $connection, $logger) {
+            $this->emit('irc.sent', array($message, $write, $connection, $logger));
         };
     }
 
@@ -401,10 +399,9 @@ class Client extends EventEmitter implements
      */
     protected function getErrorCallback(ConnectionInterface $connection)
     {
-        $client = $this;
         $logger = $this->getLogger();
-        return function($exception) use ($client, $connection, $logger) {
-            $client->emit('connect.error', array($exception, $connection, $logger));
+        return function($exception) use ($connection, $logger) {
+            $this->emit('connect.error', array($exception, $connection, $logger));
         };
     }
 
@@ -422,11 +419,10 @@ class Client extends EventEmitter implements
      */
     protected function getEndCallback(DuplexStreamInterface $stream, ConnectionInterface $connection, TimerInterface $timer)
     {
-        $client = $this;
         $logger = $this->getLogger();
-        return function() use ($client, $stream, $connection, $timer, $logger) {
-            $client->emit('connect.end', array($connection, $logger));
-            $client->cancelTimer($timer);
+        return function() use ($stream, $connection, $timer, $logger) {
+            $this->emit('connect.end', array($connection, $logger));
+            $this->cancelTimer($timer);
             $stream->close();
         };
     }
@@ -442,10 +438,9 @@ class Client extends EventEmitter implements
      */
     protected function getTickCallback(WriteStream $write, ConnectionInterface $connection)
     {
-        $client = $this;
         $logger = $this->getLogger();
-        return function() use ($client, $write, $connection, $logger) {
-            $client->emit('irc.tick', array($write, $connection, $logger));
+        return function() use ($write, $connection, $logger) {
+            $this->emit('irc.tick', array($write, $connection, $logger));
         };
     }
 
