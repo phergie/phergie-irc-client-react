@@ -115,6 +115,31 @@ class ReadStreamTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests write() with an invalid event.
+     */
+    public function testWriteWithInvalidEvent()
+    {
+        $parsed = array(
+            'invalid' => ":invalid:message\r\n",
+        );
+
+        $parser = $this->getMockParser();
+        Phake::when($parser)
+            ->consumeAll($parsed['invalid'])
+            ->thenReturn(array($parsed));
+
+        $read = $this->getMockReadStream();
+        $read->setParser($parser);
+        $read->write($parsed['invalid']);
+
+        Phake::verify($read)->emit('invalid', array($parsed['invalid']));
+        Phake::verify($read, Phake::never())->emit(
+            $this->logicalOr($this->equalTo('data'), $this->equalTo('irc.received')),
+            $this->anything()
+        );
+    }
+
+    /**
      * Returns a mock parser.
      *
      * @return \Phergie\Irc\ParserInterface
