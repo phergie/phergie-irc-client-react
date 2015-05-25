@@ -468,9 +468,7 @@ class Client extends EventEmitter implements
         $write->pipe($stream)->pipe($read);
         $read->on('irc.received', $this->getReadCallback($write, $connection));
         $write->on('data', $this->getWriteCallback($write, $connection));
-        $end = function() use ($stream) {
-            $stream->end();
-        };
+        $end = array($stream, 'end');
         $read->on('end', $end);
         $write->on('end', $end);
         $stream->on('end', $this->getEndCallback($read, $write, $connection, $timer));
