@@ -245,7 +245,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         Phake::inOrder(
             Phake::verify($this->client)->emit('connect.before.each', array($connection)),
-            Phake::verify($connection)->setOption('write', $writeStream),
+            Phake::verify($connection)->setData('write', $writeStream),
             Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
             Phake::verify($writeStream)->ircNick('nickname'),
             Phake::verify($this->client)->emit('connect.after.each', array($connection, $writeStream))
@@ -270,7 +270,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
         Phake::inOrder(
             Phake::verify($this->client)->emit('connect.before.each', array($connection)),
-            Phake::verify($connection)->setOption('write', $writeStream),
+            Phake::verify($connection)->setData('write', $writeStream),
             Phake::verify($writeStream)->ircPass('password'),
             Phake::verify($writeStream)->ircUser('username', 'hostname', 'servername', 'realname'),
             Phake::verify($writeStream)->ircNick('nickname'),
@@ -516,8 +516,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
         Phake::verify($loop)->cancelTimer($timer);
-        Phake::verify($connection)->setOption('stream', null);
-        Phake::verify($connection)->setOption('write', null);
+        Phake::verify($connection)->clearData();
         Phake::verify($writeStream)->close();
     }
 
@@ -553,8 +552,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($connection, $params[0]);
         $this->assertSame($logger, $params[1]);
         Phake::verify($loop)->cancelTimer($timer);
-        Phake::verify($connection)->setOption('stream', null);
-        Phake::verify($connection)->setOption('write', null);
+        Phake::verify($connection)->clearData();
         Phake::verify($readStream)->close();
     }
 
@@ -853,6 +851,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::when($connection)->getNickname()->thenReturn('nickname');
         Phake::when($connection)->getServerHostname()->thenReturn('0.0.0.0');
         Phake::when($connection)->getServerPort()->thenReturn($this->port);
+        Phake::when($connection)->getMask()->thenReturn('nickname!username@servername');
         return $connection;
     }
 }

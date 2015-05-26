@@ -425,8 +425,7 @@ class Client extends EventEmitter implements
         return function() use ($read, $write, $connection, $timer, $logger) {
             $this->emit('connect.end', array($connection, $logger));
             $this->cancelTimer($timer);
-            $connection->setOption('stream', null);
-            $connection->setOption('write', null);
+            $connection->clearData();
             $read->close();
             $write->close();
         };
@@ -591,9 +590,9 @@ class Client extends EventEmitter implements
     protected function initializeStream(DuplexStreamInterface $stream, ConnectionInterface $connection)
     {
         try {
-            $connection->setOption('stream', $stream);
+            $connection->setData('stream', $stream);
             $write = $this->getWriteStream($connection);
-            $connection->setOption('write', $write);
+            $connection->setData('write', $write);
             $this->configureStreams($connection, $stream, $write);
             $this->identifyUser($connection, $write);
         } catch (\Exception $e) {
