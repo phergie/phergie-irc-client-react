@@ -851,7 +851,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::when($connection)->getNickname()->thenReturn('nickname');
         Phake::when($connection)->getServerHostname()->thenReturn('0.0.0.0');
         Phake::when($connection)->getServerPort()->thenReturn($this->port);
-        Phake::when($connection)->getMask()->thenReturn('nickname!username@servername');
+        Phake::when($connection)->getMask()->thenReturn('nickname!0.0.0.0');
         return $connection;
     }
 }
