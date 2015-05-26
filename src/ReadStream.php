@@ -72,8 +72,12 @@ class ReadStream extends WritableStream
         $this->tail = $all;
 
         foreach ($messages as $message) {
-            $this->emit('data', array($message['message']));
-            $this->emit('irc.received', array($message));
+            if (isset($message['message'])) {
+                $this->emit('data', array($message['message']));
+                $this->emit('irc.received', array($message));
+            } elseif (isset($message['invalid'])) {
+                $this->emit('invalid', array($message['invalid']));
+            }
         }
     }
 }

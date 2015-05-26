@@ -271,6 +271,27 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Generates a closure for stream output logging.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @param string $level Evenement logging level to use
+     * @param string $prefix Prefix string for log lines (optional)
+     * @return callable
+     * @throws \DomainException if $level is not a valid logging level
+     */
+    protected function getOutputLogCallback(ConnectionInterface $connection, $level, $prefix = null)
+    {
+        $logger = $this->getLogger();
+        if (!method_exists($logger, $level)) {
+            throw new \DomainException("Invalid log level '$level'");
+        }
+        return function($message) use ($connection, $level, $prefix, $logger) {
+            $output = sprintf('%s %s%s', $connection->getMask(), $prefix, trim($message));
+            call_user_func(array($logger, $level), $output);
+        };
+    }
+
+    /**
      * Adds an event listener to log data emitted by a stream.
      *
      * @param \Evenement\EventEmitter $emitter
@@ -279,18 +300,8 @@ class Client extends EventEmitter implements
      */
     protected function addLogging(EventEmitter $emitter, ConnectionInterface $connection)
     {
-        $logger = $this->getLogger();
-        $callback = function($msg) use ($logger, $connection) {
-            $mask = sprintf(
-                '%s!%s@%s',
-                $connection->getNickname(),
-                $connection->getUsername(),
-                $connection->getServerHostname()
-            );
-            $logger->debug($mask . ' ' . trim($msg));
-        };
-        $emitter->on('data', $callback);
-        $emitter->on('error', $callback);
+        $emitter->on('data', $this->getOutputLogCallback($connection, 'debug'));
+        $emitter->on('error', $this->getOutputLogCallback($connection, 'notice'));
     }
 
     /**
@@ -305,6 +316,7 @@ class Client extends EventEmitter implements
     {
         $read = new ReadStream();
         $this->addLogging($read, $connection);
+        $read->on('invalid', $this->getOutputLogCallback($connection, 'notice', 'Parser unable to parse line: '));
         return $read;
     }
 
@@ -455,8 +467,7 @@ class Client extends EventEmitter implements
      * @param \Phergie\Irc\ConnectionInterface $connection Metadata for the
      *        connection over which messages are being exchanged
      * @param \React\Stream\DuplexStreamInterface $stream Stream representing the
-     *        connection
-     *        to the server
+     *        connection to the server
      * @param \Phergie\Irc\Client\React\WriteStream $write Stream used to
      *        send events to the server
      */

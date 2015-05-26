@@ -11,7 +11,7 @@
     },
     "require": {
         "php": ">=5.4.2",
-        "phergie/phergie-irc-parser": "~1.6",
+        "phergie/phergie-irc-parser": "~2.0",
         "phergie/phergie-irc-generator": "~1.5",
         "phergie/phergie-irc-connection": "~2.0",
         "react/event-loop": "~0.4.0",
