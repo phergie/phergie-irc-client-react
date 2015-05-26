@@ -286,14 +286,7 @@ class Client extends EventEmitter implements
             throw new \DomainException("Invalid log level '$level'");
         }
         return function($message) use ($connection, $level, $prefix, $logger) {
-            $output = sprintf(
-                '%s!%s@%s %s%s',
-                $connection->getNickname(),
-                $connection->getUsername(),
-                $connection->getServerHostname(),
-                $prefix,
-                trim($message)
-            );
+            $output = sprintf('%s %s%s', $connection->getMask(), $prefix, trim($message));
             call_user_func(array($logger, $level), $output);
         };
     }
