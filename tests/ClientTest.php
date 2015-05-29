@@ -224,6 +224,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         );
 
         Phake::verify($logger)->error($exception->getMessage());
+
+        Phake::verify($this->client, Phake::never())->addActiveConnection($connection);
+        $this->assertSame(array(), $this->client->getActiveConnections());
     }
 
     /**
@@ -250,6 +253,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         );
 
         Phake::verify($writeStream, Phake::never())->ircPass($this->anything());
+
+        Phake::verify($this->client)->addActiveConnection($connection);
+        $this->assertSame(array($connection), $this->client->getActiveConnections());
     }
 
     /**
@@ -274,6 +280,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             Phake::verify($writeStream)->ircNick('nickname'),
             Phake::verify($this->client)->emit('connect.after.each', array($connection, $writeStream))
         );
+
+        Phake::verify($this->client)->addActiveConnection($connection);
+        $this->assertSame(array($connection), $this->client->getActiveConnections());
     }
 
     /**
@@ -369,6 +378,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             Phake::verify($this->client)->emit('connect.error', array($exception->getMessage(), $connection, $logger)),
             Phake::verify($this->client)->emit('connect.after.each', array($connection, null))
         );
+
+        Phake::verify($this->client, Phake::never())->addActiveConnection($connection);
+        $this->assertSame(array(), $this->client->getActiveConnections());
     }
 
     /**
@@ -552,6 +564,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::verify($loop)->cancelTimer($timer);
         Phake::verify($connection)->clearData();
         Phake::verify($readStream)->close();
+
+        Phake::verify($this->client)->removeActiveConnection($connection);
+        $this->assertSame(array(), $this->client->getActiveConnections());
     }
 
     /**

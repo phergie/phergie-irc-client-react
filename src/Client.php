@@ -74,6 +74,13 @@ class Client extends EventEmitter implements
     protected $dnsServer = '8.8.8.8';
 
     /**
+     * Contains all connection instances associated with an active socket stream
+     *
+     * @var \SplObjectStorage
+     */
+    protected $activeConnections;
+
+    /**
      * Sets the event loop dependency.
      *
      * @param \React\EventLoop\LoopInterface $loop
@@ -161,6 +168,41 @@ class Client extends EventEmitter implements
     public function getTickInterval()
     {
         return $this->tickInterval;
+    }
+
+    /**
+     * Add a connection instance to the active connection store
+     *
+     * @param \Phergie\Irc\ConnectionInterface
+     */
+    protected function addActiveConnection(ConnectionInterface $connection)
+    {
+        if (!$this->activeConnections) {
+            $this->activeConnections = new \SplObjectStorage;
+        }
+        $this->activeConnections->attach($connection);
+    }
+
+    /**
+     * Remove a connection instance from the active connections store
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    protected function removeActiveConnection(ConnectionInterface $connection)
+    {
+        if ($this->activeConnections) {
+            $this->activeConnections->detach($connection);
+        }
+    }
+
+    /**
+     * Gets an array of all connections associated with an active socket stream.
+     *
+     * @return \Phergie\Irc\ConnectionInterface[]
+     */
+    public function getActiveConnections()
+    {
+        return $this->activeConnections ? iterator_to_array($this->activeConnections) : array();
     }
 
     /**
@@ -435,6 +477,7 @@ class Client extends EventEmitter implements
     {
         $logger = $this->getLogger();
         return function() use ($read, $write, $connection, $timer, $logger) {
+            $this->removeActiveConnection($connection);
             $this->emit('connect.end', array($connection, $logger));
             $this->cancelTimer($timer);
             $connection->clearData();
@@ -624,6 +667,7 @@ class Client extends EventEmitter implements
             $socket = $this->getSocket($remote, $context);
             $stream = $this->getStream($socket);
             $this->initializeStream($stream, $connection);
+            $this->addActiveConnection($connection);
         } catch (\Exception $e) {
             $this->emitConnectionError($e, $connection);
         }
