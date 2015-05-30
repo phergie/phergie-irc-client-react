@@ -419,6 +419,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $readStream,
             $writeStream
         );
+        Phake::verify($this->client)->processInput(
+            $this->message,
+            $writeStream,
+            $this->isInstanceOf('\Phergie\Irc\ConnectionInterface')
+        );
     }
 
     /**
