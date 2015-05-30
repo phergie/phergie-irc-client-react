@@ -751,5 +751,13 @@ class Client extends EventEmitter implements
      */
     protected function processInput(array $message, WriteStream $write, ConnectionInterface $connection)
     {
+        switch ($message['command']) {
+            // Update connection's internal nickname when changed
+            case 'NICK':
+                if ($connection->getNickname() === $message['nick']) {
+                    $connection->setNickname($message['params']['nickname']);
+                }
+                break;
+        }
     }
 }
