@@ -758,6 +758,11 @@ class Client extends EventEmitter implements
                     $connection->setNickname($message['params']['nickname']);
                 }
                 break;
+
+            // Play client-server ping-pong
+            case 'PING':
+                $write->ircPong($message['params']['server1']);
+                break;
         }
     }
 }
