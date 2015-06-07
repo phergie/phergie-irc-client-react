@@ -202,7 +202,7 @@ class Client extends EventEmitter implements
      */
     public function getActiveConnections()
     {
-        return $this->activeConnections ? iterator_to_array($this->activeConnections) : array();
+        return $this->activeConnections ? iterator_to_array($this->activeConnections, false) : array();
     }
 
     /**
