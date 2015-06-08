@@ -427,13 +427,13 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     /**
      * Implements \Phergie\Irc\GeneratorInterface->ircWhois().
      *
-     * @param string $server
      * @param string $nickmasks
+     * @param string $server Optional
      * @return string
      */
-    public function ircWhois($server, $nickmasks)
+    public function ircWhois($nickmasks, $server = null)
     {
-        $msg = $this->getGenerator()->ircWhois($server, $nickmasks);
+        $msg = $this->getGenerator()->ircWhois($nickmasks, $server);
         $this->emit('data', array($msg));
         return $msg;
     }
