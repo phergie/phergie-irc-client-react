@@ -123,7 +123,7 @@ class WriteStreamTest extends \PHPUnit_Framework_TestCase
             array('ircPrivmsg', array('receivers', 'text')),
             array('ircNotice', array('nickname', 'text')),
             array('ircWho', array('name', 'o')),
-            array('ircWhois', array('server', 'nickmasks')),
+            array('ircWhois', array('nickmasks', 'server')),
             array('ircWhowas', array('nickname', 'count', 'server')),
             array('ircKill', array('nickname', 'comment')),
             array('ircPing', array('server1', 'server2')),
