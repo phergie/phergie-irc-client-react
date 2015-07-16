@@ -193,11 +193,11 @@ class WriteStream extends ReadableStream implements GeneratorInterface
      * Implements \Phergie\Irc\GeneratorInterface->ircMode().
      *
      * @param string $target
-     * @param string $mode
-     * @param string $param
+     * @param string|null $mode
+     * @param string|null $param
      * @return string
      */
-    public function ircMode($target, $mode, $param = null)
+    public function ircMode($target, $mode = null, $param = null)
     {
         $msg = $this->getGenerator()->ircMode($target, $mode, $param);
         $this->emit('data', array($msg));
