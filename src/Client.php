@@ -421,6 +421,7 @@ class Client extends EventEmitter implements
     {
         $logger = $this->getLogger();
         return function($message) use ($write, $connection, $logger) {
+            $this->processInput($message, $write, $connection);
             $this->emit('irc.received', array($message, $write, $connection, $logger));
         };
     }
@@ -784,5 +785,36 @@ class Client extends EventEmitter implements
     public function isTimerActive(TimerInterface $timer)
     {
         return $this->getLoop()->isTimerActive($timer);
+    }
+
+    /**
+     * There are certain incoming events that the client processes internally.
+     * These functions are essential to the client-server relationship: for example,
+     * updating the connection's stored nickname, responding to PING events, etc.
+     *
+     * Any user-level IRC functionality handled internally by the client
+     * should be implemented here.
+     *
+     * @param array $message Parser output
+     * @param \Phergie\Irc\Client\React\WriteStream $write Write stream
+     *        corresponding to the read stream on which the event occurred
+     * @param \Phergie\Irc\ConnectionInterface $connection Connection on
+     *        which the event occurred
+     */
+    protected function processInput(array $message, WriteStream $write, ConnectionInterface $connection)
+    {
+        switch ($message['command']) {
+            // Update connection's internal nickname when changed
+            case 'NICK':
+                if ($connection->getNickname() === $message['nick']) {
+                    $connection->setNickname($message['params']['nickname']);
+                }
+                break;
+
+            // Play client-server ping-pong
+            case 'PING':
+                $write->ircPong($message['params']['server1']);
+                break;
+        }
     }
 }

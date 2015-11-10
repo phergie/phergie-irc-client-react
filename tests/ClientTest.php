@@ -17,6 +17,7 @@ use Phake;
 use Phergie\Irc\Client\React\Exception;
 use Phergie\Irc\Client\React\ReadStream;
 use Phergie\Irc\Client\React\WriteStream;
+use Phergie\Irc\ConnectionInterface;
 use React\EventLoop\LoopInterface;
 use React\SocketClient\SecureConnector;
 use React\Stream\StreamInterface;
@@ -429,6 +430,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             $readStream,
             $writeStream
         );
+        Phake::verify($this->client)->processInput(
+            $this->message,
+            $writeStream,
+            $this->isInstanceOf('\Phergie\Irc\ConnectionInterface')
+        );
     }
 
     /**
@@ -679,6 +685,74 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             Phake::verify($this->client)->emit('connect.after.all', array($connections, $writeStreams)),
             Phake::verify($loop, Phake::times(1))->run()
         );
+    }
+
+    /**
+     * Sets up and executes a test for processInput().
+     *
+     * @param array $message
+     * @param \Phergie\Irc\Client\React\WriteStream $writeStream
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     */
+    protected function doInternalProcessingTest(array $message, WriteStream $writeStream, ConnectionInterface $connection)
+    {
+        $logger = $this->getMockLogger();
+        $loop = $this->getMockLoop();
+        $readStream = $this->getMockReadStream();
+        $stream = $this->getMockStream();
+        Phake::when($this->client)->getStream(Phake::anyParameters())->thenReturn($stream);
+        Phake::when($this->client)->getReadStream($connection)->thenReturn($readStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+
+        $this->client->setLoop($loop);
+        $this->client->setLogger($logger);
+        $this->client->setResolver($this->getMockResolver());
+        $this->client->addConnection($connection);
+
+        Phake::verify($readStream)->on('irc.received', Phake::capture($callback));
+        call_user_func($callback, $message, $writeStream, $connection);
+    }
+
+    /**
+     * Tests processInput() handling a client nickname change.
+     */
+    public function testProcessInputNickChange()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        Phake::when($connection)->getNickname()->thenReturn('Phergie3');
+        $writeStream = $this->getMockWriteStream();
+
+        $message = array(
+            'command' => 'NICK',
+            'nick' => 'Phergie3',
+            'params' => array(
+                'nickname' => 'Phergie3_',
+            ),
+        );
+
+        $this->doInternalProcessingTest($message, $writeStream, $connection);
+
+        Phake::verify($connection)->setNickname('Phergie3_');
+    }
+
+    /**
+     * Tests processInput() handling a server ping.
+     */
+    public function testProcessInputServerPing()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        $writeStream = $this->getMockWriteStream();
+
+        $message = array(
+            'command' => 'PING',
+            'params' => array(
+                'server1' => 'pingserver',
+            ),
+        );
+
+        $this->doInternalProcessingTest($message, $writeStream, $connection);
+
+        Phake::verify($writeStream)->ircPong('pingserver');
     }
 
     /**
