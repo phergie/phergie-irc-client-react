@@ -10,7 +10,7 @@
         "source": "https://github.com/phergie/phergie-irc-client-react"
     },
     "require": {
-        "php": ">=5.4.2",
+        "php": ">=5.5",
         "phergie/phergie-irc-parser": "~2.0",
         "phergie/phergie-irc-generator": "~1.5",
         "phergie/phergie-irc-connection": "~2.0",
@@ -24,6 +24,9 @@
     },
     "require-dev": {
         "phergie/phergie-irc-bot-react-development": "~1.0.0"
+    },
+    "conflict" : {
+        "phergie/phergie-irc-plugin-react-pong": "*"
     },
     "autoload": {
         "psr-4": {
