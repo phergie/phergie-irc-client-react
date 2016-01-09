@@ -661,6 +661,32 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * Tests run() with a single connection but the loop doesn't autorun.
+     */
+    public function testRunWithSingleConnectionNoAutorun()
+    {
+        $loop = $this->getMockLoop();
+        $connection = $this->getMockConnection();
+        $connections = array($connection);
+        $writeStream = $this->getMockWriteStream();
+        $writeStreams = array($writeStream);
+        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
+        Phake::when($this->client)->getLoop()->thenReturn($loop);
+
+        $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver('null'));
+        $this->client->run($connection, false);
+
+        Phake::inOrder(
+            Phake::verify($this->client)->emit('connect.before.all', array($connections)),
+            Phake::verify($this->client)->addConnection($connection),
+            Phake::verify($this->client)->emit('connect.after.all', array($connections, $writeStreams)),
+            Phake::verify($loop, Phake::never())->run()
+        );
+    }
+
+    /**
      * Tests run() with a connection configured to use the SSL transport.
      */
     public function testRunWithConnectionUsingSslTransport()
