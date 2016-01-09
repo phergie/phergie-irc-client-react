@@ -684,7 +684,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
             Phake::verify($this->client)->emit('connect.after.all', array($connections, $writeStreams))
         );
         
-        Phake::verify($loop, Phake::never())->run()
+        Phake::verify($loop, Phake::never())->run();
     }
 
     /**
