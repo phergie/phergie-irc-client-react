@@ -681,9 +681,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::inOrder(
             Phake::verify($this->client)->emit('connect.before.all', array($connections)),
             Phake::verify($this->client)->addConnection($connection),
-            Phake::verify($this->client)->emit('connect.after.all', array($connections, $writeStreams)),
-            Phake::verify($loop, Phake::never())->run()
+            Phake::verify($this->client)->emit('connect.after.all', array($connections, $writeStreams))
         );
+        
+        Phake::verify($loop, Phake::never())->run()
     }
 
     /**
