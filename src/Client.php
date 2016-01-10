@@ -703,7 +703,7 @@ class Client extends EventEmitter implements
      * connections remain.
      *
      * @param \Phergie\Irc\ConnectionInterface|\Phergie\Irc\ConnectionInterface[] $connections
-     * @param bool $aurotun
+     * @param bool $autorun
      */
     public function run($connections, $autorun = true)
     {
