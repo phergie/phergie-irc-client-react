@@ -46,6 +46,10 @@ $client->run($connection);
 
 // Also works:
 // $client->run(array($connection1, ..., $connectionN));
+
+// Also possible:
+// Don't autorun the event loopin case you pass your own event loop and run it yourself 
+// $client->run($connection, false);
 ```
 
 1. Create and configure an instance of the connection class, `\Phergie\Irc\Connection`, for each server the bot will connect to. See [phergie-irc-connection documentation](https://github.com/phergie/phergie-irc-connection#usage) for more information on configuring connection objects.

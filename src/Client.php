@@ -703,8 +703,9 @@ class Client extends EventEmitter implements
      * connections remain.
      *
      * @param \Phergie\Irc\ConnectionInterface|\Phergie\Irc\ConnectionInterface[] $connections
+     * @param bool $autorun
      */
-    public function run($connections)
+    public function run($connections, $autorun = true)
     {
         if (!is_array($connections)) {
             $connections = array($connections);
@@ -728,7 +729,9 @@ class Client extends EventEmitter implements
         );
         $this->emit('connect.after.all', array($connections, $writes));
 
-        $this->getLoop()->run();
+        if ($autorun) {
+            $this->getLoop()->run();
+        }
     }
 
     /**
