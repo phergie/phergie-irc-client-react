@@ -21,6 +21,7 @@ use React\Dns\Resolver\Resolver;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 use React\Stream\Stream;
 use React\Stream\DuplexStreamInterface;
 
@@ -270,8 +271,7 @@ class Client extends EventEmitter implements
         $port = $connection->getServerPort();
 
         $deferred = new Deferred();
-        $this->getResolver()
-            ->resolve($hostname)
+        $this->resolveHostname($hostname)
             ->then(
                 function($ip) use($deferred, $port) {
                     $deferred->resolve('tcp://' . $ip . ':' . $port);
@@ -282,6 +282,21 @@ class Client extends EventEmitter implements
             );
 
         return $deferred->promise();
+    }
+
+    /**
+     * Resolve an IP address from a hostname
+     *
+     * @param string $hostname
+     * @return PromiseInterface promise resolving to the hostname's IP
+     */
+    protected function resolveHostname($hostname)
+    {
+        if (false !== filter_var($hostname, FILTER_VALIDATE_IP)) {
+            return \React\Promise\resolve($hostname);
+        }
+
+        return $this->getResolver()->resolve($hostname);
     }
 
     /**
