@@ -485,7 +485,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testErrorCallbackResolverReject()
     {
-        $connection = $this->getMockConnectionForAddConnection();
+        $connection = $this->getMockConnectionForAddConnection('example.invalid');
         $logger = $this->getMockLogger();
 
         $this->client->setLogger($logger);
@@ -954,7 +954,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      *
      * @return \Phergie\Irc\ConnectionInterface
      */
-    protected function getMockConnectionForAddConnection()
+    protected function getMockConnectionForAddConnection($hostname = '0.0.0.0')
     {
         $connection = $this->getMockConnection();
         Phake::when($connection)->getPassword()->thenReturn('password');
@@ -963,7 +963,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::when($connection)->getServername()->thenReturn('servername');
         Phake::when($connection)->getRealname()->thenReturn('realname');
         Phake::when($connection)->getNickname()->thenReturn('nickname');
-        Phake::when($connection)->getServerHostname()->thenReturn('0.0.0.0');
+        Phake::when($connection)->getServerHostname()->thenReturn($hostname);
         Phake::when($connection)->getServerPort()->thenReturn($this->port);
         Phake::when($connection)->getMask()->thenReturn('nickname!username@0.0.0.0');
         return $connection;
