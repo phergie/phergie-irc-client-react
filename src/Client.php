@@ -259,6 +259,28 @@ class Client extends EventEmitter implements
     }
 
     /**
+     * Extracts the value of the allow-selfsigned option from a given connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return boolean TRUE to allow self signed certificates, FALSE otherwise
+     */
+    protected function getAllowSelfSignedFlag(ConnectionInterface $connection)
+    {
+        return (boolean) $connection->getOption('allow-selfsigned') ?: false;
+    }
+
+    /**
+     * Extracts the value of the verify_peer option from a given connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return boolean TRUE to verify peer, FALSE otherwise
+     */
+    protected function getVerifyPeerFlag(ConnectionInterface $connection)
+    {
+        return (boolean) $connection->getOption('allow-verify_peer') ?: false;
+    }
+
+    /**
      * Derives a remote for a given connection.
      *
      * @param \Phergie\Irc\ConnectionInterface $connection
@@ -297,6 +319,28 @@ class Client extends EventEmitter implements
             $context['bindto'] = '0.0.0.0:0';
         }
         $context = array('socket' => $context);
+        return $context;
+    }
+
+    /**
+     * Derives a set of socket context options for a given secure connection.
+     *
+     * @param \Phergie\Irc\ConnectionInterface $connection
+     * @return array Associative array of context option key-value pairs
+     */
+    protected function getSecureContext(ConnectionInterface $connection)
+    {
+        $context = array();
+        if ($this->getForceIpv4Flag($connection)) {
+            $context['bindto'] = '0.0.0.0:0';
+        }
+        if ($this->getVerifyPeerFlag($connection)) {
+            $context['verify_peer'] = false;
+        }
+        if ($this->getAllowSelfSignedFlag($connection)) {
+            $context['allow_self_signed'] = true;
+        }
+        //$context = array('socket' => $context);
         return $context;
     }
 
@@ -601,7 +645,7 @@ class Client extends EventEmitter implements
         if (!$this->secureConnector) {
             $loop = $this->getLoop();
             $connector = new \React\SocketClient\Connector($loop, $this->getResolver());
-            $this->secureConnector = new \React\SocketClient\SecureConnector($connector, $loop);
+            $this->secureConnector = new \React\SocketClient\SecureConnector($connector, $loop, $this->getSecureContext($connection));
         }
         return $this->secureConnector;
     }
@@ -615,14 +659,6 @@ class Client extends EventEmitter implements
      */
     protected function addSecureConnection(ConnectionInterface $connection)
     {
-        // @see https://github.com/reactphp/socket-client/issues/4
-        if ($this->getForceIpv4Flag($connection)) {
-            throw new Exception(
-                'Using the SSL transport and IPv4 together is not currently supported',
-                Exception::ERR_CONNECTION_STATE_UNSUPPORTED
-            );
-        }
-
         $hostname = $connection->getServerHostname();
         $port = $connection->getServerPort();
 
