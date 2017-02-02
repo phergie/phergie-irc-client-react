@@ -640,7 +640,7 @@ class Client extends EventEmitter implements
      *
      * @return \React\SocketClient\SecureConnector
      */
-    protected function getSecureConnector()
+    protected function getSecureConnector($connection)
     {
         if (!$this->secureConnector) {
             $loop = $this->getLoop();
@@ -662,7 +662,7 @@ class Client extends EventEmitter implements
         $hostname = $connection->getServerHostname();
         $port = $connection->getServerPort();
 
-        $this->getSecureConnector()
+        $this->getSecureConnector($connection)
             ->create($hostname, $port)
             ->then(
                 function(DuplexStreamInterface $stream) use ($connection) {
