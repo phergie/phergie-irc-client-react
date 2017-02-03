@@ -337,19 +337,20 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      * @see https://github.com/reactphp/socket-client/issues/4
      */
 /*
-    public function testAddConnectionWithSslTransportAndForceIpv4Works()
+    public function testAddConnectionWithSslTransportAndForceIpv4()
     {
         $connection = $this->getMockConnectionForAddConnection();
         Phake::when($connection)->getOption('transport')->thenReturn('ssl');
         Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
-        $this->client->setResolver($this->getMockResolver());
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
-        try {
-            $this->client->addConnection($connection);
-            $this->assertSame(Exception::ERR_CONNECTION_STATE_UNSUPPORTED, $e->getCode());
-        } catch (Exception $e) {
-            $this->fail('Unexpected exception was thrown');
-        }
+        $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver());
+        $this->client->addConnection($connection);
+
+        print_r(stream_context_get_options($connection->getData('stream')));
+        //print_r($actual);
     }
 */
 

@@ -266,7 +266,7 @@ class Client extends EventEmitter implements
      */
     protected function getAllowSelfSignedFlag(ConnectionInterface $connection)
     {
-        return (boolean) $connection->getOption('allow-selfsigned') ?: false;
+        return (boolean) $connection->getOption('allow-self-signed') ?: false;
     }
 
     /**
@@ -277,7 +277,7 @@ class Client extends EventEmitter implements
      */
     protected function getVerifyPeerFlag(ConnectionInterface $connection)
     {
-        return (boolean) $connection->getOption('allow-verify_peer') ?: false;
+        return (boolean) $connection->getOption('allow-verify-peer') ?: false;
     }
 
     /**
@@ -340,7 +340,6 @@ class Client extends EventEmitter implements
         if ($this->getAllowSelfSignedFlag($connection)) {
             $context['allow_self_signed'] = true;
         }
-        //$context = array('socket' => $context);
         return $context;
     }
 
