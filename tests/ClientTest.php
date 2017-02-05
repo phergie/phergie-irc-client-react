@@ -332,11 +332,10 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that adding a connection configured to use the SSL transport and
-     * force use of IPv4 does not throw an exception.
+     * force use of IPv4 does not throw an exception
      *
      * @see https://github.com/reactphp/socket-client/issues/4
      */
-/*
     public function testAddConnectionWithSslTransportAndForceIpv4()
     {
         $connection = $this->getMockConnectionForAddConnection();
@@ -348,11 +347,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->client->setLogger($this->getMockLogger());
         $this->client->setResolver($this->getMockResolver());
         $this->client->addConnection($connection);
-
-        print_r(stream_context_get_options($connection->getData('stream')));
-        //print_r($actual);
     }
-*/
 
     /**
      * Tests that a connect.error event is emitted if a stream initialized

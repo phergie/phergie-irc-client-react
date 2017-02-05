@@ -259,7 +259,7 @@ class Client extends EventEmitter implements
     }
 
     /**
-     * Extracts the value of the allow-selfsigned option from a given connection.
+     * Extracts the value of the allow-self-signed option from a given connection.
      *
      * @param \Phergie\Irc\ConnectionInterface $connection
      * @return boolean TRUE to allow self signed certificates, FALSE otherwise
@@ -267,17 +267,6 @@ class Client extends EventEmitter implements
     protected function getAllowSelfSignedFlag(ConnectionInterface $connection)
     {
         return (boolean) $connection->getOption('allow-self-signed') ?: false;
-    }
-
-    /**
-     * Extracts the value of the verify_peer option from a given connection.
-     *
-     * @param \Phergie\Irc\ConnectionInterface $connection
-     * @return boolean TRUE to verify peer, FALSE otherwise
-     */
-    protected function getVerifyPeerFlag(ConnectionInterface $connection)
-    {
-        return (boolean) $connection->getOption('allow-verify-peer') ?: false;
     }
 
     /**
@@ -333,9 +322,6 @@ class Client extends EventEmitter implements
         $context = array();
         if ($this->getForceIpv4Flag($connection)) {
             $context['bindto'] = '0.0.0.0:0';
-        }
-        if ($this->getVerifyPeerFlag($connection)) {
-            $context['verify_peer'] = false;
         }
         if ($this->getAllowSelfSignedFlag($connection)) {
             $context['allow_self_signed'] = true;
