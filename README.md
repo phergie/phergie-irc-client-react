@@ -298,6 +298,15 @@ Connection sockets will use IPv6 by default where available. If you need to forc
 $connection->setOption('force-ipv4', true);
 ```
 
+### allow-self-signed
+
+By default all ssl connections only accept officially signed certificates. Sometimes you need to connect to a irc server that uses a self signed certificate. If you need to allow connections to servers using a self signed certificate, set this option to `true`.
+
+```php
+<?php
+$connection->setOption('allow-self-signed', true);
+```
+
 ### transport
 
 By default, a standard TCP socket is used. For IRC servers that support TLS or SSL, specify an [appropriate transport](http://www.php.net/manual/en/transports.inet.php).
