@@ -332,23 +332,21 @@ class ClientTest extends \PHPUnit_Framework_TestCase
 
     /**
      * Tests that adding a connection configured to use the SSL transport and
-     * force use of IPv4 throws an exception.
+     * force use of IPv4 does not throw an exception
      *
      * @see https://github.com/reactphp/socket-client/issues/4
      */
-    public function testAddConnectionWithSslTransportAndForceIpv4ThrowsException()
+    public function testAddConnectionWithSslTransportAndForceIpv4()
     {
         $connection = $this->getMockConnectionForAddConnection();
         Phake::when($connection)->getOption('transport')->thenReturn('ssl');
         Phake::when($connection)->getOption('force-ipv4')->thenReturn(true);
-        $this->client->setResolver($this->getMockResolver());
+        $writeStream = $this->getMockWriteStream();
+        Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
 
-        try {
-            $this->client->addConnection($connection);
-            $this->fail('Expected exception was not thrown');
-        } catch (Exception $e) {
-            $this->assertSame(Exception::ERR_CONNECTION_STATE_UNSUPPORTED, $e->getCode());
-        }
+        $this->client->setLogger($this->getMockLogger());
+        $this->client->setResolver($this->getMockResolver());
+        $this->client->addConnection($connection);
     }
 
     /**
@@ -366,7 +364,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $exception = new Exception('message');
         Phake::when($this->client)->identifyUser($connection, $writeStream)->thenThrow($exception);
 
-        Phake::when($this->client)->getSecureConnector()->thenReturn($this->getMockSecureConnector());
+        Phake::when($this->client)->getSecureConnector($connection)->thenReturn($this->getMockSecureConnector());
 
         $logger = $this->getMockLogger();
 
