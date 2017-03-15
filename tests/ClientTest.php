@@ -239,7 +239,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         Phake::when($connection)->getPassword()->thenReturn(null);
         $writeStream = $this->getMockWriteStream();
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
-        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($connection)->getData('write')->thenReturn($writeStream);
 
         $this->client->setLogger($this->getMockLogger());
         $this->client->setResolver($this->getMockResolver());
@@ -267,7 +267,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $connection = $this->getMockConnectionForAddConnection();
         $writeStream = $this->getMockWriteStream();
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
-        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($connection)->getData('write')->thenReturn($writeStream);
 
         $this->client->setLogger($this->getMockLogger());
         $this->client->setResolver($this->getMockResolver());
@@ -616,8 +616,8 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $writeStreams = array($writeStream1, $writeStream2);
         Phake::when($this->client)->getWriteStream($connection1)->thenReturn($writeStream1);
         Phake::when($this->client)->getWriteStream($connection2)->thenReturn($writeStream2);
-        Phake::when($connection1)->getOption('write')->thenReturn($writeStream1);
-        Phake::when($connection2)->getOption('write')->thenReturn($writeStream2);
+        Phake::when($connection1)->getData('write')->thenReturn($writeStream1);
+        Phake::when($connection2)->getData('write')->thenReturn($writeStream2);
 
         $this->client->setLogger($this->getMockLogger());
         $this->client->setResolver($this->getMockResolver('null'));
@@ -642,7 +642,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $connections = array($connection);
         $writeStream = $this->getMockWriteStream();
         $writeStreams = array($writeStream);
-        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($connection)->getData('write')->thenReturn($writeStream);
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
@@ -668,7 +668,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $connections = array($connection);
         $writeStream = $this->getMockWriteStream();
         $writeStreams = array($writeStream);
-        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($connection)->getData('write')->thenReturn($writeStream);
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($this->client)->getLoop()->thenReturn($loop);
 
@@ -695,7 +695,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $connections = array($connection);
         $writeStream = $this->getMockWriteStream();
         $writeStreams = array($writeStream);
-        Phake::when($connection)->getOption('write')->thenReturn($writeStream);
+        Phake::when($connection)->getData('write')->thenReturn($writeStream);
         Phake::when($connection)->getOption('transport')->thenReturn('ssl');
         Phake::when($this->client)->getWriteStream($connection)->thenReturn($writeStream);
         Phake::when($this->client)->getLoop()->thenReturn($loop);

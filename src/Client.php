@@ -667,7 +667,7 @@ class Client extends EventEmitter implements
             ->then(
                 function(DuplexStreamInterface $stream) use ($connection) {
                     $this->initializeStream($stream, $connection);
-                    $this->emit('connect.after.each', array($connection, $connection->getOption('write')));
+                    $this->emit('connect.after.each', array($connection, $connection->getData('write')));
                 }
             );
     }
@@ -709,7 +709,7 @@ class Client extends EventEmitter implements
             $this->emitConnectionError($e, $connection);
         }
 
-        $this->emit('connect.after.each', array($connection, $connection->getOption('write')));
+        $this->emit('connect.after.each', array($connection, $connection->getData('write')));
     }
 
     /**
@@ -759,7 +759,7 @@ class Client extends EventEmitter implements
 
         $writes = array_map(
             function($connection) {
-                return $connection->getOption('write');
+                return $connection->getData('write');
             },
             $connections
         );
