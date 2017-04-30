@@ -10,12 +10,8 @@ A bare-bones PHP-based IRC client library built on React.
 
 The recommended method of installation is [through composer](http://getcomposer.org).
 
-```JSON
-{
-    "require": {
-        "phergie/phergie-irc-client-react": "~2"
-    }
-}
+```
+composer require phergie/phergie-irc-client-react
 ```
 
 ## Design goals
