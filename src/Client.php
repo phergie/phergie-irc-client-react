@@ -22,7 +22,7 @@ use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use React\Stream\Stream;
+use React\Stream\DuplexResourceStream;
 use React\Stream\DuplexStreamInterface;
 
 /**
@@ -60,7 +60,7 @@ class Client extends EventEmitter implements
     /**
      * Connector used to establish SSL connections
      *
-     * @var \React\SocketClient\SecureConnector
+     * @var \React\Socket\SecureConnector
      */
     protected $secureConnector;
 
@@ -353,7 +353,7 @@ class Client extends EventEmitter implements
      */
     protected function getStream($socket)
     {
-        return new Stream($socket, $this->getLoop());
+        return new DuplexResourceStream($socket, $this->getLoop());
     }
 
     /**
@@ -638,14 +638,16 @@ class Client extends EventEmitter implements
     /**
      * Returns a connector for establishing SSL connections.
      *
-     * @return \React\SocketClient\SecureConnector
+     * @return \React\Socket\SecureConnector
      */
     protected function getSecureConnector($connection)
     {
         if (!$this->secureConnector) {
             $loop = $this->getLoop();
-            $connector = new \React\SocketClient\Connector($loop, $this->getResolver());
-            $this->secureConnector = new \React\SocketClient\SecureConnector($connector, $loop, $this->getSecureContext($connection));
+            $connector = new \React\Socket\Connector($loop, [
+                'dns' => $this->getResolver(),
+            ]);
+            $this->secureConnector = new \React\Socket\SecureConnector($connector, $loop, $this->getSecureContext($connection));
         }
         return $this->secureConnector;
     }
@@ -663,7 +665,7 @@ class Client extends EventEmitter implements
         $port = $connection->getServerPort();
 
         $this->getSecureConnector($connection)
-            ->create($hostname, $port)
+            ->connect($hostname . ':' . $port)
             ->then(
                 function(DuplexStreamInterface $stream) use ($connection) {
                     $this->initializeStream($stream, $connection);
@@ -778,7 +780,7 @@ class Client extends EventEmitter implements
      * @param numeric $interval Number of seconds to wait before executing
      *        callback
      * @param callable $callback Callback to execute
-     * @return \React\Event\Timer\TimerInterface Added timer
+     * @return \React\EventLoop\Timer\TimerInterface Added timer
      */
     public function addTimer($interval, $callback)
     {
@@ -792,7 +794,7 @@ class Client extends EventEmitter implements
      *
      * @param numeric $interval Number of seconds to wait between executions of callback
      * @param callable $callback Callback to execute
-     * @return \React\Event\Timer\TimerInterface Added timer
+     * @return \React\EventLoop\Timer\TimerInterface Added timer
      */
     public function addPeriodicTimer($interval, $callback)
     {
@@ -804,7 +806,7 @@ class Client extends EventEmitter implements
      * addPeriodicTimer(). Proxies to the cancelTimer() implementation of the
      * event loop implementation returned by getLoop().
      *
-     * @param \React\Event\Timer\TimerInterface $timer Timer returned by
+     * @param \React\EventLoop\Timer\TimerInterface $timer Timer returned by
      *        addTimer() or addPeriodicTimer()
      */
     public function cancelTimer(TimerInterface $timer)
@@ -817,7 +819,7 @@ class Client extends EventEmitter implements
      * active. Proxies to the isTimerActive() implementation of the event loop
      * implementation returned by getLoop().
      *
-     * @param \React\Event\Timer\TimerInterface $timer Timer returned by
+     * @param \React\EventLoop\Timer\TimerInterface $timer Timer returned by
      *        addTimer() or addPeriodicTimer()
      * @return boolean TRUE if the specified timer is active, FALSE otherwise
      */

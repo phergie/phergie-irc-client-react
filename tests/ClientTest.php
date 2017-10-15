@@ -18,9 +18,6 @@ use Phergie\Irc\Client\React\Exception;
 use Phergie\Irc\Client\React\ReadStream;
 use Phergie\Irc\Client\React\WriteStream;
 use Phergie\Irc\ConnectionInterface;
-use React\EventLoop\LoopInterface;
-use React\SocketClient\SecureConnector;
-use React\Stream\StreamInterface;
 
 /**
  * Tests for \Phergie\Irc\Client\React\Client.
@@ -889,7 +886,7 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockStream()
     {
-        return Phake::mock('\React\Stream\Stream');
+        return Phake::mock('\React\Stream\DuplexStreamInterface');
     }
 
     /**
@@ -941,9 +938,9 @@ class ClientTest extends \PHPUnit_Framework_TestCase
      */
     protected function getMockSecureConnector()
     {
-        $connector = Phake::mock('\React\SocketClient\SecureConnector');
+        $connector = Phake::mock('\React\Socket\ConnectorInterface');
         $promise = new FakePromiseResolve($this->getMockStream());
-        Phake::when($connector)->create('0.0.0.0', $this->port)->thenReturn($promise);
+        Phake::when($connector)->connect('0.0.0.0' . ':' . $this->port)->thenReturn($promise);
         return $connector;
     }
 

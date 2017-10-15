@@ -10,8 +10,9 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Evenement\EventEmitter;
 use Phergie\Irc\ParserInterface;
-use React\Stream\WritableStream;
+use React\Stream\WritableStreamInterface;
 
 /**
  * Stream that extracts IRC messages from data piped to it and emits them as
@@ -20,7 +21,7 @@ use React\Stream\WritableStream;
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-class ReadStream extends WritableStream
+class ReadStream extends EventEmitter implements WritableStreamInterface
 {
     /**
      * IRC message parser
@@ -35,6 +36,11 @@ class ReadStream extends WritableStream
      * @var string
      */
     protected $tail = '';
+
+    /**
+     * @var bool
+     */
+    protected $closed = false;
 
     /**
      * Sets the IRC message parser in use.
@@ -67,6 +73,10 @@ class ReadStream extends WritableStream
      */
     public function write($data)
     {
+        if ($this->closed) {
+            return;
+        }
+
         $all = $this->tail . $data;
         $messages = $this->getParser()->consumeAll($all);
         $this->tail = $all;
@@ -79,5 +89,21 @@ class ReadStream extends WritableStream
                 $this->emit('invalid', array($message['invalid']));
             }
         }
+    }
+
+    public function isWritable()
+    {
+        return !$this->closed;
+    }
+
+    public function end($data = null)
+    {
+        $this->write($data);
+        $this->close();
+    }
+
+    public function close()
+    {
+        $this->closed = true;
     }
 }
