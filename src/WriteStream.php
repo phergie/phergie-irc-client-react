@@ -32,6 +32,11 @@ class WriteStream extends EventEmitter implements ReadableStreamInterface, Gener
     protected $generator;
 
     /**
+     * @var bool
+     */
+    protected $closed = false;
+
+    /**
      * Returns the IRC message generator in use.
      *
      * @return \Phergie\Irc\GeneratorInterface
@@ -56,27 +61,34 @@ class WriteStream extends EventEmitter implements ReadableStreamInterface, Gener
 
     public function isReadable()
     {
-        // TODO: Implement isReadable() method.
+        return !$this->closed;
     }
 
     public function pause()
     {
-        // TODO: Implement pause() method.
     }
 
     public function resume()
     {
-        // TODO: Implement resume() method.
     }
 
     public function pipe(WritableStreamInterface $dest, array $options = array())
     {
-        return Util::pipe($this, $dest, $options);
+        Util::pipe($this, $dest, $options);
+
+        return $dest;
     }
 
     public function close()
     {
-        // TODO: Implement close() method.
+        if ($this->closed) {
+            return;
+        }
+
+        $this->closed = true;
+        $this->emit('end', array($this));
+        $this->emit('close', array($this));
+        $this->removeAllListeners();
     }
 
     /**
