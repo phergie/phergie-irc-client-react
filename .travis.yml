@@ -7,6 +7,7 @@ php:
 
 before_script:
   - composer self-update
+  - composer config --unset platform.php
   - composer install --dev
   - mkdir -p build/logs
 
