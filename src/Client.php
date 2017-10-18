@@ -644,9 +644,12 @@ class Client extends EventEmitter implements
     {
         if (!$this->secureConnector) {
             $loop = $this->getLoop();
-            $connector = new \React\Socket\Connector($loop, [
-                'dns' => $this->getResolver(),
-            ]);
+            $connector = new \React\Socket\Connector(
+                $loop,
+                [
+                    'dns' => $this->getResolver(),
+                ]
+            );
             $this->secureConnector = new \React\Socket\SecureConnector($connector, $loop, $this->getSecureContext($connection));
         }
         return $this->secureConnector;
