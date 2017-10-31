@@ -24,6 +24,7 @@ use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\DuplexResourceStream;
 use React\Stream\DuplexStreamInterface;
+use React\Stream\Stream;
 
 /**
  * IRC client implementation based on the React component library.
@@ -353,7 +354,11 @@ class Client extends EventEmitter implements
      */
     protected function getStream($socket)
     {
-        return new DuplexResourceStream($socket, $this->getLoop());
+        if (class_exists(DuplexResourceStream::class)) {
+            return new DuplexResourceStream($socket, $this->getLoop());
+        }
+
+        return new Stream($socket, $this->getLoop());
     }
 
     /**

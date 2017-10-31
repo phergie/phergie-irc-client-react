@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "50d417574355a04603fa1418f201b23e",
+    "content-hash": "c00f627875c74e37142749a93e3723f2",
     "packages": [
         {
             "name": "evenement/evenement",
@@ -506,16 +506,16 @@
         },
         {
             "name": "react/socket",
-            "version": "v0.8.4",
+            "version": "v0.8.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reactphp/socket.git",
-                "reference": "ce2b577c2d69ee071c3f9e552942c320caa87e0a"
+                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reactphp/socket/zipball/ce2b577c2d69ee071c3f9e552942c320caa87e0a",
-                "reference": "ce2b577c2d69ee071c3f9e552942c320caa87e0a",
+                "url": "https://api.github.com/repos/reactphp/socket/zipball/d169d1ed24e39bf182781d72ddd224dbbd449aa8",
+                "reference": "d169d1ed24e39bf182781d72ddd224dbbd449aa8",
                 "shasum": ""
             },
             "require": {
@@ -528,8 +528,8 @@
                 "react/stream": "^1.0 || ^0.7.1"
             },
             "require-dev": {
-                "clue/block-react": "^1.1",
-                "phpunit/phpunit": "~4.8"
+                "clue/block-react": "^1.2",
+                "phpunit/phpunit": "^5.0 || ^4.8"
             },
             "type": "library",
             "autoload": {
@@ -549,7 +549,7 @@
                 "reactphp",
                 "stream"
             ],
-            "time": "2017-09-16T17:16:49+00:00"
+            "time": "2017-10-23T21:45:58+00:00"
         },
         {
             "name": "react/stream",
