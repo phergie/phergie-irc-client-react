@@ -10,8 +10,11 @@
 
 namespace Phergie\Irc\Client\React;
 
+use Evenement\EventEmitter;
 use Phergie\Irc\GeneratorInterface;
-use React\Stream\ReadableStream;
+use React\Stream\ReadableStreamInterface;
+use React\Stream\Util;
+use React\Stream\WritableStreamInterface;
 
 /**
  * Stream that sends IRC messages to a server.
@@ -19,7 +22,7 @@ use React\Stream\ReadableStream;
  * @category Phergie
  * @package Phergie\Irc\Client\React
  */
-class WriteStream extends ReadableStream implements GeneratorInterface
+class WriteStream extends EventEmitter implements ReadableStreamInterface, GeneratorInterface
 {
     /**
      * Generator composed to write IRC messages to the stream
@@ -27,6 +30,11 @@ class WriteStream extends ReadableStream implements GeneratorInterface
      * @var \Phergie\Irc\GeneratorInterface
      */
     protected $generator;
+
+    /**
+     * @var bool
+     */
+    protected $closed = false;
 
     /**
      * Returns the IRC message generator in use.
@@ -49,6 +57,38 @@ class WriteStream extends ReadableStream implements GeneratorInterface
     public function setGenerator(GeneratorInterface $generator)
     {
         $this->generator = $generator;
+    }
+
+    public function isReadable()
+    {
+        return !$this->closed;
+    }
+
+    public function pause()
+    {
+    }
+
+    public function resume()
+    {
+    }
+
+    public function pipe(WritableStreamInterface $dest, array $options = array())
+    {
+        Util::pipe($this, $dest, $options);
+
+        return $dest;
+    }
+
+    public function close()
+    {
+        if ($this->closed) {
+            return;
+        }
+
+        $this->closed = true;
+        $this->emit('end', array($this));
+        $this->emit('close', array($this));
+        $this->removeAllListeners();
     }
 
     /**

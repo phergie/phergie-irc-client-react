@@ -14,9 +14,9 @@
         "phergie/phergie-irc-parser": "~2.0",
         "phergie/phergie-irc-generator": "~1.5",
         "phergie/phergie-irc-connection": "~2.0",
-        "react/event-loop": "~0.4.0",
-        "react/stream": "~0.4.2",
-        "react/socket-client": "^0.5",
+        "react/event-loop": "^1.0 || ^0.5 || ^0.4.0",
+        "react/stream": "^1.0 || ^0.7 || ^0.6 || ^0.5 || ^0.4",
+        "react/socket": "^1.0 || ^0.8 || ^0.7",
         "react/dns": "~0.4.0",
         "react/promise": "~2.0",
         "psr/log": "~1.0",
@@ -36,6 +36,11 @@
     "autoload-dev": {
         "psr-4": {
             "Phergie\\Irc\\Tests\\Client\\React\\": "tests"
+        }
+    },
+    "config": {
+        "platform": {
+            "php": "5.5.23"
         }
     }
 }
