@@ -495,6 +495,33 @@ class ClientTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($logger, $params[2]);
     }
 
+
+    /**
+     * Tests that the client emits an event when a secure connection failed.
+     */
+    public function testErrorCallbackSecureConnectorReject()
+    {
+        $connection = $this->getMockConnectionForAddConnection();
+        Phake::when($connection)->getOption('transport')->thenReturn('ssl');
+        Phake::when($this->client)->getSecureConnector($connection)->thenReturn($this->getMockSecureConnector(true));
+
+        $logger = $this->getMockLogger();
+        $this->client->setLogger($logger);
+        $this->client->setLoop($this->getMockLoop());
+        $this->client->addConnection($connection);
+
+        Phake::verify($this->client)->emit('connect.error', Phake::capture($params));
+        $this->assertInternalType('array', $params);
+        $this->assertCount(3, $params);
+        $this->assertSame('Connection failed', $params[0]);
+        $this->assertSame($connection, $params[1]);
+        $this->assertSame($logger, $params[2]);
+
+        Phake::verify($this->client, Phake::never())->addActiveConnection($connection);
+        $this->assertSame(array(), $this->client->getActiveConnections());
+    }
+
+
     /**
      * Tests that the client emits an event when a connection is terminated.
      */
@@ -934,12 +961,15 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns a mock secure connector.
      *
+     * @param bool $reject
      * @return \React\SocketClient\SecureConnector
      */
-    protected function getMockSecureConnector()
+    protected function getMockSecureConnector($reject = false)
     {
         $connector = Phake::mock('\React\Socket\ConnectorInterface');
-        $promise = new FakePromiseResolve($this->getMockStream());
+        $promise = ($reject)
+            ? new FakePromiseReject(new Exception('Connection failed'))
+            : new FakePromiseResolve($this->getMockStream());
         Phake::when($connector)->connect('0.0.0.0' . ':' . $this->port)->thenReturn($promise);
         return $connector;
     }
