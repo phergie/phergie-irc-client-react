@@ -31,7 +31,8 @@
     "autoload": {
         "psr-4": {
             "Phergie\\Irc\\Client\\React\\": "src"
-        }
+        },
+        "files": ["src/timer_class_alias.php"]
     },
     "autoload-dev": {
         "psr-4": {
