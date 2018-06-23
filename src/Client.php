@@ -823,20 +823,6 @@ class Client extends EventEmitter implements
     }
 
     /**
-     * Checks if a timer created using addTimer() or addPeriodicTimer() is
-     * active. Proxies to the isTimerActive() implementation of the event loop
-     * implementation returned by getLoop().
-     *
-     * @param \React\EventLoop\Timer\TimerInterface $timer Timer returned by
-     *        addTimer() or addPeriodicTimer()
-     * @return boolean TRUE if the specified timer is active, FALSE otherwise
-     */
-    public function isTimerActive(TimerInterface $timer)
-    {
-        return $this->getLoop()->isTimerActive($timer);
-    }
-
-    /**
      * There are certain incoming events that the client processes internally.
      * These functions are essential to the client-server relationship: for example,
      * updating the connection's stored nickname, responding to PING events, etc.
