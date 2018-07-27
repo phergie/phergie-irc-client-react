@@ -822,20 +822,6 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tests isTimerActive().
-     */
-    public function testIsTimerActive()
-    {
-        $timer = $this->getMockTimer();
-        $loop = $this->getMockLoop();
-        Phake::when($this->client)->getLoop()->thenReturn($loop);
-
-        $this->client->isTimerActive($timer);
-
-        Phake::verify($loop)->isTimerActive($timer);
-    }
-
-    /**
      * Returns a mock logger.
      *
      * @return \Psr\Log\LoggerInterface
@@ -848,11 +834,11 @@ class ClientTest extends \PHPUnit_Framework_TestCase
     /**
      * Returns a mock timer.
      *
-     * @return \React\EventLoop\Timer\TimerInterface
+     * @return \React\EventLoop\TimerInterface
      */
     protected function getMockTimer()
     {
-        return Phake::mock('\React\EventLoop\Timer\TimerInterface');
+        return Phake::mock('\React\EventLoop\TimerInterface');
     }
 
     /**

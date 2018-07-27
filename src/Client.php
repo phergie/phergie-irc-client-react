@@ -19,7 +19,7 @@ use Phergie\Irc\ConnectionInterface;
 use React\Dns\Resolver\Factory;
 use React\Dns\Resolver\Resolver;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
+use React\EventLoop\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\DuplexResourceStream;
@@ -820,20 +820,6 @@ class Client extends EventEmitter implements
     public function cancelTimer(TimerInterface $timer)
     {
         $this->getLoop()->cancelTimer($timer);
-    }
-
-    /**
-     * Checks if a timer created using addTimer() or addPeriodicTimer() is
-     * active. Proxies to the isTimerActive() implementation of the event loop
-     * implementation returned by getLoop().
-     *
-     * @param \React\EventLoop\Timer\TimerInterface $timer Timer returned by
-     *        addTimer() or addPeriodicTimer()
-     * @return boolean TRUE if the specified timer is active, FALSE otherwise
-     */
-    public function isTimerActive(TimerInterface $timer)
-    {
-        return $this->getLoop()->isTimerActive($timer);
     }
 
     /**
