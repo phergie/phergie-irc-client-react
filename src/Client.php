@@ -678,6 +678,9 @@ class Client extends EventEmitter implements
                 function(DuplexStreamInterface $stream) use ($connection) {
                     $this->initializeStream($stream, $connection);
                     $this->emit('connect.after.each', array($connection, $connection->getData('write')));
+                },
+                function($error) use($connection) {
+                    $this->emitConnectionError($error, $connection);
                 }
             );
     }
